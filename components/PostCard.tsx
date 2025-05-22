@@ -77,7 +77,7 @@ export default function PostCard({ post }: Props) {
       layout
     >
       <HStack justify="space-between" mb={2} flexWrap="wrap">
-        <Badge colorScheme="purple">{post.generatorName}</Badge>
+        <Badge paddingX="2">{post.generatorName}</Badge>
         <Text fontSize="xs" color="fg.muted">
           {new Date(post.timestamp).toLocaleTimeString()}
         </Text>
@@ -102,7 +102,7 @@ export default function PostCard({ post }: Props) {
 
       {post.moreLink && (
         <ChakraLink href={post.moreLink} color="teal.500">
-          More&nbsp;↗
+            More
         </ChakraLink>
       )}
 

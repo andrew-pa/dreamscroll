@@ -50,7 +50,7 @@ export default function FeedPage() {
     }
   }, [posts.length, mutate]);
 
-  if (error) return <Center h="100vh">failed to load 😢</Center>;
+  if (error) return <Center h="100vh">Failed to load new posts! 😢</Center>;
 
   return (
     <Box
