@@ -1,95 +1,75 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
-export default function Home() {
+import {
+  Box,
+  VStack,
+  Center,
+  Spinner,
+} from '@chakra-ui/react';
+import { useMemo, useEffect } from 'react';
+import useSWRInfinite from 'swr/infinite';
+import { useInView } from 'react-intersection-observer';
+import PostCard, { Post } from '@/components/PostCard';
+
+const PAGE_SIZE = 15;
+const MAX_POSTS = 200;
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
+const key = (page: number, prev: Post[] | null) =>
+  prev && prev.length === 0
+    ? null
+    : `/api/unseen?limit=${PAGE_SIZE}&after=${prev?.at(-1)?.timestamp ?? ''}`;
+
+export default function FeedPage() {
+  const { data, error, size, setSize, isValidating, mutate } =
+    useSWRInfinite<Post[]>(key, fetcher, { revalidateOnFocus: false });
+
+  const posts = useMemo(() => (data ? ([] as Post[]).concat(...data) : []), [data]);
+
+  /** sentinel to pull the next page */
+  const { ref: bottomRef, inView: bottomVisible } = useInView();
+  useEffect(() => {
+    if (bottomVisible && !isValidating) setSize(s => s + 1);
+  }, [bottomVisible, isValidating, setSize]);
+
+  /** keep memory footprint small */
+  useEffect(() => {
+    if (posts.length > MAX_POSTS) {
+      mutate(old =>
+        old
+          ? old
+              .flat()
+              .slice(posts.length - MAX_POSTS) // keep newest N
+              .reduce<Post[][]>((acc, p, i) => {
+                const page = Math.floor(i / PAGE_SIZE);
+                (acc[page] ??= []).push(p);
+                return acc;
+              }, [])
+          : old,
+      );
+    }
+  }, [posts.length, mutate]);
+
+  if (error) return <Center h="100vh">failed to load 😢</Center>;
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Box
+      h="100vh"
+      overflowY="auto"
+      bg={{ base: 'gray.50', _dark: 'gray.900' }}
+      px={{ base: 2, md: 4 }}
+      py={4}
+    >
+      <VStack align="stretch">
+        {posts.map(p => (
+          <PostCard key={p.id} post={p} />
+        ))}
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <Center ref={bottomRef} py={4}>
+          {isValidating && <Spinner size="sm" />}
+        </Center>
+      </VStack>
+    </Box>
   );
 }
+
