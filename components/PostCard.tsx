@@ -94,7 +94,7 @@ export default function PostCard({ post }: Props) {
         </ChakraLink>
       )}
 
-      <HStack mt={3} gap={3}>
+      <HStack mt={3} gap={3} justify="right">
         <IconButton
           aria-label="dislike"
           size="sm"

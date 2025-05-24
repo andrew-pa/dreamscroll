@@ -90,14 +90,7 @@ export default function FeedPage() {
   if (error) return <Center h="100vh">Failed to load new posts! 😢</Center>;
 
   return (
-    <Box
-      h="100vh"
-      overflowY="auto"
-      bg={{ base: 'gray.50', _dark: 'gray.900' }}
-      px={{ base: 2, md: 4 }}
-      py={4}
-    >
-      <VStack align="stretch">
+      <VStack align="stretch" px={{ base: 2, md: 4 }} py={4}>
         {posts.map(p => (
           <PostCard key={p.id} post={p} />
         ))}
@@ -111,7 +104,6 @@ export default function FeedPage() {
           )}
         </Center>
       </VStack>
-    </Box>
   );
 }
 
