@@ -29,7 +29,16 @@ export function NavBar() {
                 textAlign="center"
                 lineHeight="1"
             >
-                dreamscroll
+                <Link
+                    as={NextLink}
+                    href="/"
+                    color="inherit"
+                    _focusVisible={{ boxShadow: "outline" }}
+                    textDecor="none"
+                    _hover={{ textDecor: "none" }}
+                >
+                    dreamscroll
+                </Link>
             </Heading>
 
             {/* 3 ▸ RIGHT slot — settings icon (always) + bookmark on desktop */}
@@ -42,8 +51,8 @@ export function NavBar() {
                     display={{ base: "none", md: "inline-flex" }}
                 />
                 <NavIcon
-                    href="/settings"
-                    label="Settings"
+                    href="/generators"
+                    label="Generators"
                     icon={<FiSettings />}
                 />
             </Flex>
