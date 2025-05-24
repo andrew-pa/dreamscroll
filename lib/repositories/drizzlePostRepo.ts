@@ -14,7 +14,7 @@ import { pagenatedPosts, scorePosts } from "../scorePosts";
 const HOUR = 3_600_000; // ms → hour
 
 export class DrizzlePostRepository implements IPostRepository {
-    async create(p: CreatePostRecord) {
+    async create(p: CreatePostRecord): Promise<PostRecord> {
         const now = new Date();
         const [row] = await db
             .insert(posts)
@@ -28,7 +28,7 @@ export class DrizzlePostRepository implements IPostRepository {
                 reaction: "none",
             })
             .returning();
-        return row;
+        return row as PostRecord;
     }
 
     async markSeen(id: number, when: Date) {

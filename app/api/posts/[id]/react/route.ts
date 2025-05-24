@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { DrizzlePostRepository } from "@/lib/repositories/drizzlePostRepo";
 import type { Reaction } from "@/lib/db/schema";
+import { getPostRepository } from "@/lib/repositories";
 
-const repo = new DrizzlePostRepository();
+const repo = getPostRepository();
 
 export async function POST(
     req: NextRequest,

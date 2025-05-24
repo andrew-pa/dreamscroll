@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { DrizzlePostRepository } from "@/lib/repositories/drizzlePostRepo";
 import {
     decodeCursor,
     encodeCursor,
     ScoringParams,
 } from "@/lib/repositories/postRepository";
+import { getPostRepository } from "@/lib/repositories";
 
 export const dynamic = "force-dynamic";
 
-const repo = new DrizzlePostRepository();
+const repo = getPostRepository();
 
 /** Default UX values (same as your table). */
 const DEFAULT_PARAMS: ScoringParams = {
