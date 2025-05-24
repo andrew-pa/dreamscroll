@@ -1,7 +1,5 @@
-export const GENERATOR_TYPES = [
-    'text', 'picture'
-] as const;
-export type GeneratorType = typeof GENERATOR_TYPES[number];
+export const GENERATOR_TYPES = ["text", "picture"] as const;
+export type GeneratorType = (typeof GENERATOR_TYPES)[number];
 
 export interface GeneratorRecord {
     id: string;
@@ -14,7 +12,11 @@ export interface GeneratorRecord {
 export interface IGeneratorRepository {
     list(): Promise<GeneratorRecord[]>;
 
-    create(input: { name: string; type: GeneratorType, config?: unknown }): Promise<GeneratorRecord>;
+    create(input: {
+        name: string;
+        type: GeneratorType;
+        config?: unknown;
+    }): Promise<GeneratorRecord>;
 
     update(
         id: string,

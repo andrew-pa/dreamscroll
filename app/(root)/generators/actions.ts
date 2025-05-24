@@ -1,8 +1,8 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { getGeneratorRepository } from '@/lib/repositories';
-import { GeneratorType } from '@/lib/repositories/generatorRepository';
+import { revalidatePath } from "next/cache";
+import { getGeneratorRepository } from "@/lib/repositories";
+import { GeneratorType } from "@/lib/repositories/generatorRepository";
 
 /* ─────────────────────────────────────────────────────────────── *
  *  All writes go through these actions → consistent, testable.    *
@@ -18,22 +18,21 @@ export async function listGenerators() {
 export async function createGenerator(name: string, type: GeneratorType) {
     const repo = getGeneratorRepository();
     await repo.create({ name, type });
-    revalidatePath('/generators');
+    revalidatePath("/generators");
 }
 
 export async function updateGenerator(
-  id: string,
-  name: string,
-  config: unknown,
+    id: string,
+    name: string,
+    config: unknown,
 ) {
     const repo = getGeneratorRepository();
     await repo.update(id, { name, config });
-    revalidatePath('/generators');
+    revalidatePath("/generators");
 }
 
 export async function deleteGenerator(id: string) {
     const repo = getGeneratorRepository();
     await repo.delete(id);
-    revalidatePath('/generators');
+    revalidatePath("/generators");
 }
-
