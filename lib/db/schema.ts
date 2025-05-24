@@ -30,3 +30,18 @@ export const posts = sqliteTable(
         ),
     ],
 );
+
+export const GENERATOR_TYPES = ["text", "picture"] as const;
+export type GeneratorType = (typeof GENERATOR_TYPES)[number];
+
+export const generators = sqliteTable("generators", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull(),
+    type: text("type", { enum: GENERATOR_TYPES })
+        .$type<GeneratorType>()
+        .notNull(),
+    config: text("config", { mode: "json" }).$type<unknown>().notNull(),
+    lastRun: integer("last_run", { mode: "timestamp" })
+        .$type<Date | null>()
+        .default(null),
+});

@@ -1,8 +1,9 @@
-export const GENERATOR_TYPES = ["text", "picture"] as const;
-export type GeneratorType = (typeof GENERATOR_TYPES)[number];
+export type { GeneratorType } from "@/lib/db/schema";
+export { GENERATOR_TYPES } from "@/lib/db/schema";
+import type { GeneratorType } from "@/lib/db/schema";
 
 export interface GeneratorRecord {
-    id: string;
+    id: number;
     name: string;
     type: GeneratorType;
     config: unknown;
@@ -19,9 +20,9 @@ export interface IGeneratorRepository {
     }): Promise<GeneratorRecord>;
 
     update(
-        id: string,
+        id: number,
         patch: { name?: string; config?: unknown },
     ): Promise<GeneratorRecord>;
 
-    delete(id: string): Promise<void>;
+    delete(id: number): Promise<void>;
 }
