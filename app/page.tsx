@@ -9,42 +9,79 @@ import {
 import { useMemo, useEffect } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { useInView } from 'react-intersection-observer';
-import PostCard, { Post } from '@/components/PostCard';
+import PostCard from '@/components/PostCard';
+import { PostRecord } from '@/lib/repositories/postRepository';
 
-const PAGE_SIZE = 15;
-const MAX_POSTS = 200;
+interface PostBatch {
+    page: PostRecord[],
+    next: string | null
+}
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
-const key = (page: number, prev: Post[] | null) =>
-  prev && prev.length === 0
-    ? null
-    : `/api/unseen?limit=${PAGE_SIZE}&after=${prev?.at(-1)?.timestamp ?? ''}`;
+/* ---------- tweak to taste ---------- */
+const PAGE_SIZE   = 50;  // matches DEFAULT_PARAMS.batchSize
+const MAX_POSTS   = 500; // soft cap kept in memory
+/* ------------------------------------ */
+
+const fetcher = (url: string) => fetch(url).then(r => r.json() as Promise<PostBatch>);
+
+/**
+ * SWR “infinite” key:
+ *   • first page → /api/unseen?limit=20
+ *   • later pages → /api/unseen?limit=20&cursor=<opaque>
+ *   • when nextCursor===null  → return `null`  (stop)
+ */
+const getKey =
+  (_pageIndex: number, prev: PostBatch | null) =>
+    prev && prev.next === null
+      ? null
+      : `/api/unseen?limit=${PAGE_SIZE}` +
+        (prev?.next ? `&cursor=${prev.next}` : '');
 
 export default function FeedPage() {
-  const { data, error, size, setSize, isValidating, mutate } =
-    useSWRInfinite<Post[]>(key, fetcher, { revalidateOnFocus: false });
+  const {
+    data,
+    error,
+    size,
+    setSize,
+    isValidating,
+    mutate,
+  } = useSWRInfinite<PostBatch>(getKey, fetcher, { revalidateOnFocus: false });
 
-  const posts = useMemo(() => (data ? ([] as Post[]).concat(...data) : []), [data]);
+  /* flat list for easy rendering */
+  const posts = useMemo(
+    () => (data ? data.flatMap(p => p.page) : []),
+    [data],
+  );
 
-  /** sentinel to pull the next page */
-  const { ref: bottomRef, inView: bottomVisible } = useInView();
+  /* sentinel that triggers the next fetch */
+  const { ref: bottomRef, inView } = useInView();
+  const lastPage = data?.[data.length - 1];
+  const hasMore  = lastPage ? lastPage.next !== null : true;
+
   useEffect(() => {
-    if (bottomVisible && !isValidating) setSize(s => s + 1);
-  }, [bottomVisible, isValidating, setSize]);
+    if (inView && hasMore && !isValidating) setSize(s => s + 1);
+  }, [inView, hasMore, isValidating, setSize]);
 
-  /** keep memory footprint small */
+  /* keep memory footprint bounded */
   useEffect(() => {
     if (posts.length > MAX_POSTS) {
       mutate(old =>
         old
-          ? old
-              .flat()
-              .slice(posts.length - MAX_POSTS) // keep newest N
-              .reduce<Post[][]>((acc, p, i) => {
-                const page = Math.floor(i / PAGE_SIZE);
-                (acc[page] ??= []).push(p);
-                return acc;
-              }, [])
+          ? (() => {
+              /* keep the newest MAX_POSTS items
+                 and recompute their paging structure */
+              const keep = posts.slice(-MAX_POSTS);
+              const pages: PostBatch[] = [];
+              for (let i = 0; i < keep.length; i += PAGE_SIZE) {
+                pages.push({
+                  page: keep.slice(i, i + PAGE_SIZE),
+                  /* nextCursor is unknown for trimmed pages,
+                     but SWR never re‑requests them, so null is fine. */
+                  next: null,
+                });
+              }
+              return pages;
+            })()
           : old,
       );
     }
@@ -67,6 +104,11 @@ export default function FeedPage() {
 
         <Center ref={bottomRef} py={4}>
           {isValidating && <Spinner size="sm" />}
+          {!hasMore && !isValidating && (
+            <Box color="gray.500" fontSize="sm">
+              ~ No more posts ~
+            </Box>
+          )}
         </Center>
       </VStack>
     </Box>

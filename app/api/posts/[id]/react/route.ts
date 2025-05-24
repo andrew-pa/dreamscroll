@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { posts, Reaction } from '../../../mock-data';
+import { DrizzlePostRepository } from '@/lib/repositories/drizzlePostRepo';
+import type { Reaction } from '@/lib/db/schema';
+
+const repo = new DrizzlePostRepository();
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  params: Promise<{ params: { id: string } }>,
 ) {
-  const { reaction } = (await req.json()) as { reaction: Reaction };
-  const p = posts.find(p => p.id === params.id);
-  if (p) p.reaction = reaction;
-
-  return NextResponse.json({ ok: true, reaction }, { status: 200 });
+  const { reaction } = (await req.json()) as { reaction: Reaction | 'none' };
+  const { params: { id } } = await params;
+  await repo.toggleReaction(Number(id), reaction ?? 'none', new Date());
+  return NextResponse.json({ ok: true, reaction });
 }
-

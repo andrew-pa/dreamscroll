@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Box,
   Text,
   Image,
   HStack,
@@ -14,18 +13,7 @@ import { motion, isValidMotionProp } from 'framer-motion';
 import { chakra } from '@chakra-ui/react';
 import { useInView } from 'react-intersection-observer';
 import { useState, useEffect, useRef } from 'react';
-
-export type Reaction = 'dislike' | 'like' | 'heart' | null;
-
-export interface Post {
-  id: string;
-  generatorName: string;
-  imageUrl?: string | null;
-  moreLink?: string | null;
-  body?: string | null;
-  timestamp: string; // ISO
-  reaction: Reaction;
-}
+import { PostRecord, Reaction } from '@/lib/repositories/postRepository';
 
 const MotionBox = chakra(motion.div, {
   shouldForwardProp: prop =>
@@ -33,7 +21,7 @@ const MotionBox = chakra(motion.div, {
 });
 
 interface Props {
-  post: Post;
+  post: PostRecord;
 }
 
 export default function PostCard({ post }: Props) {
@@ -55,7 +43,7 @@ export default function PostCard({ post }: Props) {
 
   /** toggle reaction */
   const toggle = async (kind: Reaction) => {
-    const next = reaction === kind ? null : kind;
+    const next = reaction === kind ? 'none' : kind;
     setReaction(next);
     await fetch(`/api/posts/${post.id}/react`, {
       method: 'POST',

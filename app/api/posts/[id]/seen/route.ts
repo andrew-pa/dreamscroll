@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { posts } from '../../../mock-data';
+import { DrizzlePostRepository } from '@/lib/repositories/drizzlePostRepo';
+
+const repo = new DrizzlePostRepository();
 
 export async function POST(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  params: Promise<{ params: { id: string } }>,
 ) {
-  const p = posts.find(p => p.id === params.id);
-  if (p) p.seen = true;
-
-  // 204 No Content is fine here.
+  const { params: { id } } = await params;
+  await repo.markSeen(Number(id), new Date());
   return new NextResponse(null, { status: 204 });
 }
 
