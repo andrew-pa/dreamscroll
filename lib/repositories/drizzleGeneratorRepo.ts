@@ -5,8 +5,12 @@ import { IGeneratorRepository, GeneratorRecord } from "./generatorRepository";
 
 /** Concrete Drizzle implementation */
 export class DrizzleGeneratorRepository implements IGeneratorRepository {
-    async list(): Promise<GeneratorRecord[]> {
-        return (await db.select().from(generators).all()) as GeneratorRecord[];
+    async list(type?: GeneratorType): Promise<GeneratorRecord[]> {
+        let stmt: any = db.select().from(generators);
+        if (type) {
+            stmt = stmt.where(eq(generators.type, type));
+        }
+        return (await stmt.all()) as GeneratorRecord[];
     }
 
     async create(input: {
@@ -44,6 +48,13 @@ export class DrizzleGeneratorRepository implements IGeneratorRepository {
 
         if (!row) throw new Error(`Generator ${id} not found`);
         return row;
+    }
+
+    async recordRun(id: number, timestamp: Date): Promise<void> {
+        await db
+            .update(generators)
+            .set({ lastRun: timestamp })
+            .where(eq(generators.id, id));
     }
 
     async delete(id: number): Promise<void> {

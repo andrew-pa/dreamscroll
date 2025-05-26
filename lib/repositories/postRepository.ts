@@ -4,6 +4,7 @@ export type { Reaction } from "@/lib/db/schema";
 
 export interface PostRecord {
     id: number;
+    generatorId: number;
     generatorName: string;
     imageUrl?: string | null;
     moreLink?: string | null;
@@ -57,8 +58,9 @@ export interface PostBatch {
 }
 
 export interface IPostRepository {
-    /** Insert a brand‑new post (not required by your UI but useful in tests). */
+    /** Insert a brand‑new post */
     create(post: CreatePostRecord): Promise<PostRecord>;
+    createMany(post: CreatePostRecord[]): Promise<void>;
 
     /** The main feed endpoint. */
     selectBatch(

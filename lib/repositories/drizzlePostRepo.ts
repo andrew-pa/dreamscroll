@@ -25,22 +25,30 @@ import { pagenatedPosts, scorePosts } from "../scorePosts";
 
 const HOUR = 3_600_000; // ms → hour
 
+function postInsertValues(p: CreatePostRecord): Omit<PostRecord, "id"> {
+    return {
+        generatorId: p.generatorId,
+        generatorName: p.generatorName,
+        imageUrl: p.imageUrl,
+        moreLink: p.moreLink,
+        body: p.body,
+        timestamp: p.timestamp ?? new Date(),
+        seenCount: 0,
+        reaction: "none",
+    };
+}
+
 export class DrizzlePostRepository implements IPostRepository {
     async create(p: CreatePostRecord): Promise<PostRecord> {
-        const now = new Date();
         const [row] = await db
             .insert(posts)
-            .values({
-                generatorName: p.generatorName,
-                imageUrl: p.imageUrl,
-                moreLink: p.moreLink,
-                body: p.body,
-                timestamp: p.timestamp ?? now,
-                seenCount: 0,
-                reaction: "none",
-            })
+            .values(postInsertValues(p))
             .returning();
         return row as PostRecord;
+    }
+
+    async createMany(newPosts: CreatePostRecord[]): Promise<void> {
+        await db.insert(posts).values(newPosts.map(postInsertValues));
     }
 
     async markSeen(id: number, when: Date) {

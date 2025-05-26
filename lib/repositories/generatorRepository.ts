@@ -11,7 +11,7 @@ export interface GeneratorRecord {
 }
 
 export interface IGeneratorRepository {
-    list(): Promise<GeneratorRecord[]>;
+    list(type?: GeneratorType): Promise<GeneratorRecord[]>;
 
     create(input: {
         name: string;
@@ -23,6 +23,8 @@ export interface IGeneratorRepository {
         id: number,
         patch: { name?: string; config?: unknown },
     ): Promise<GeneratorRecord>;
+
+    recordRun(id: number, timestamp: Date): Promise<void>;
 
     delete(id: number): Promise<void>;
 }

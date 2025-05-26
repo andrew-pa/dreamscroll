@@ -7,6 +7,7 @@ export const posts = sqliteTable(
     "posts",
     {
         id: integer("id").primaryKey({ autoIncrement: true }),
+        generatorId: integer("generator_id").notNull().references(() => generators.id),
         generatorName: text("generator_name").notNull(),
         imageUrl: text("image_url"),
         moreLink: text("more_link"),

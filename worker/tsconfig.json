@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "outDir": "../dist/worker",
+        "rootDir": "..",
+        "target": "ESNext",
+        "lib": ["esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "preserve",
+        "incremental": true,
+        "plugins": [],
+        "paths": {
+            "@/*": ["./*", "../lib/*"]
+        }
+    },
+    "include": ["**/*.ts", "../lib/**/*.ts"],
+    "exclude": ["node_modules"]
+}
