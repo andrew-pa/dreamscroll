@@ -29,14 +29,7 @@ export function NavBar() {
                 textAlign="center"
                 lineHeight="1"
             >
-                <Link
-                    as={NextLink}
-                    href="/"
-                    color="inherit"
-                    _focusVisible={{ boxShadow: "outline" }}
-                    textDecor="none"
-                    _hover={{ textDecor: "none" }}
-                >
+                <Link as={NextLink} href="/" color="inherit" textDecor="none">
                     dreamscroll
                 </Link>
             </Heading>

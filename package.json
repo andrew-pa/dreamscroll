@@ -6,7 +6,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "fmt": "npx prettier --write ."
     },
     "dependencies": {
         "@chakra-ui/icons": "^2.2.4",
