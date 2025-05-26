@@ -68,6 +68,13 @@ export interface IPostRepository {
         limit: number,
     ): Promise<PostBatch>;
 
+    /** Get the posts which have been reacted to with one of the reactions in `reactionsFilter`. */
+    listSaved(
+        reactionsFilter: Reaction[],
+        limit: number,
+        offset: number,
+    ): Promise<PostRecord[]>;
+
     markSeen(id: number, when: Date): Promise<void>;
 
     toggleReaction(

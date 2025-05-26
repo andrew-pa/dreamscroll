@@ -1,6 +1,18 @@
 import { db } from "@/lib/db";
 import { posts, type Reaction } from "@/lib/db/schema";
-import { eq, sql, asc, desc, and, gt, gte, lte } from "drizzle-orm";
+import {
+    eq,
+    sql,
+    asc,
+    desc,
+    and,
+    gt,
+    gte,
+    lte,
+    inArray,
+    isNotNull,
+    notInArray,
+} from "drizzle-orm";
 import type {
     CreatePostRecord,
     Cursor,
@@ -74,11 +86,7 @@ export class DrizzlePostRepository implements IPostRepository {
             .select()
             .from(posts)
             .where(
-                and(
-                    sql` reaction NOT IN ('like','dislike')`,
-                    eq(posts.seenCount, 0),
-                    gte(posts.timestamp, freshCutoff),
-                ),
+                and(eq(posts.seenCount, 0), gte(posts.timestamp, freshCutoff)),
             )
             .orderBy(desc(posts.timestamp))
             .limit(p.candidatePoolSize)
@@ -89,7 +97,6 @@ export class DrizzlePostRepository implements IPostRepository {
             .from(posts)
             .where(
                 and(
-                    sql` reaction NOT IN ('like','dislike')`,
                     gt(posts.seenCount, 0),
                     lte(posts.lastSeenTs, revisitCutoff),
                 ),
@@ -103,5 +110,24 @@ export class DrizzlePostRepository implements IPostRepository {
         const scored = scorePosts(p, candidates, now);
 
         return pagenatedPosts(scored, cursor, limit);
+    }
+
+    async listSaved(
+        reactionsFilter: Reaction[],
+        limit: number,
+        offset: number,
+    ): Promise<PostRecord[]> {
+        if (reactionsFilter.length === 0) return [];
+
+        const rows = await db
+            .select()
+            .from(posts)
+            .where(and(inArray(posts.reaction, reactionsFilter)))
+            .orderBy(desc(posts.reactionTs))
+            .limit(limit)
+            .offset(offset)
+            .all();
+
+        return rows as PostRecord[];
     }
 }

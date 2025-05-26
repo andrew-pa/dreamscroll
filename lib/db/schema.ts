@@ -28,6 +28,7 @@ export const posts = sqliteTable(
             table.seenCount,
             asc(table.lastSeenTs),
         ),
+        index("idx_posts_saved").on(table.reaction, desc(table.reactionTs)),
     ],
 );
 

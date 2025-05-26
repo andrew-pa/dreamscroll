@@ -20,8 +20,8 @@ const DEFAULT_PARAMS: ScoringParams = {
     weightRevisit: 0.6,
     reactionPenalty: {
         heart: 0.4,
-        like: 0.7,
-        dislike: 2,
+        like: 1,
+        dislike: 4,
     },
     randomness: 0.01,
 };
