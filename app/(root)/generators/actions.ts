@@ -22,7 +22,7 @@ export async function createGenerator(name: string, type: GeneratorType) {
 }
 
 export async function updateGenerator(
-    id: string,
+    id: number,
     name: string,
     config: unknown,
 ) {
@@ -31,7 +31,7 @@ export async function updateGenerator(
     revalidatePath("/generators");
 }
 
-export async function deleteGenerator(id: string) {
+export async function deleteGenerator(id: number) {
     const repo = getGeneratorRepository();
     await repo.delete(id);
     revalidatePath("/generators");

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+    Box,
     Text,
     Image,
     HStack,
@@ -9,16 +10,9 @@ import {
     Link as ChakraLink,
 } from "@chakra-ui/react";
 import { AiOutlineDislike, AiOutlineLike, AiFillHeart } from "react-icons/ai";
-import { motion, isValidMotionProp } from "framer-motion";
-import { chakra } from "@chakra-ui/react";
 import { useInView } from "react-intersection-observer";
 import { useState, useEffect, useRef } from "react";
 import { PostRecord, Reaction } from "@/lib/repositories/postRepository";
-
-const MotionBox = chakra(motion.div, {
-    shouldForwardProp: prop =>
-        isValidMotionProp(prop) || ["children"].includes(prop as string),
-});
 
 interface Props {
     post: PostRecord;
@@ -58,16 +52,12 @@ export default function PostCard({ post }: Props) {
     };
 
     return (
-        <MotionBox
+        <Box
             ref={ref}
             bg={{ base: "white", _dark: "gray.800" }}
             rounded="md"
             shadow="sm"
             p={4}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            layout
         >
             <HStack justify="space-between" mb={2} flexWrap="wrap">
                 <Badge paddingX="2">{post.generatorName}</Badge>
@@ -128,6 +118,6 @@ export default function PostCard({ post }: Props) {
                     <AiFillHeart />
                 </IconButton>
             </HStack>
-        </MotionBox>
+        </Box>
     );
 }

@@ -216,7 +216,7 @@ export class Prompt {
 const wordpos = new WordPOS();
 
 /** Helper to wrap WordPOS random methods so the signature matches `(count)=>Promise<string[]>` */
-function wp(method: keyof WordPOS) {
+function wp(method: keyof typeof WordPOS) {
     return async (count: number): Promise<string[]> => {
         // WordPOS random APIs always return an array; fall back to single‑word form
         // if the lib returns a string for count == 1 (older versions do this).

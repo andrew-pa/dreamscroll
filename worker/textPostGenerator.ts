@@ -1,4 +1,4 @@
-import { CreatePostRecord } from "@/repositories/postRepository";
+import { CreatePostRecord } from "../lib/repositories/postRepository";
 import { PostGenerator } from ".";
 import { isPromptDef, Prompt, PromptDef } from "./prompt";
 import OpenAI from "openai";

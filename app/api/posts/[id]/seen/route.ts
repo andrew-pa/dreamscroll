@@ -5,11 +5,9 @@ const repo = getPostRepository();
 
 export async function POST(
     _req: NextRequest,
-    params: Promise<{ params: { id: string } }>,
+    { params }: { params: Promise<{ id: string }> },
 ) {
-    const {
-        params: { id },
-    } = await params;
+    const { id } = await params;
     await repo.markSeen(Number(id), new Date());
     return new NextResponse(null, { status: 204 });
 }

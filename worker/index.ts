@@ -1,6 +1,6 @@
 import { GENERATOR_TYPES, GeneratorType } from "../lib/db/schema";
 import { getGeneratorRepository, getPostRepository } from "../lib/repositories";
-import { CreatePostRecord } from "@/repositories/postRepository";
+import { CreatePostRecord } from "../lib/repositories/postRepository";
 import { TextPostGenerator } from "./textPostGenerator";
 
 const generatorsRepo = getGeneratorRepository();

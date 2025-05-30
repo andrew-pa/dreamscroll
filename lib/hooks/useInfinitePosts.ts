@@ -22,7 +22,8 @@ interface UseInfinitePostsOptions {
  * @returns { posts, error, isLoading, hasMore, loadMore }
  */
 export function useInfinitePosts<
-    TBatch extends { page: TItem[]; next: number | null },
+    TNext,
+    TBatch extends { page: TItem[]; next: TNext | null },
     TItem = TBatch["page"][0],
 >(
     getKey: (pageIndex: number, prev: TBatch | null) => string | null,

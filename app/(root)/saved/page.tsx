@@ -29,12 +29,14 @@ export default function SavedPostsPage() {
     const toggle = (r: Reaction) =>
         setFilters(f => (f.includes(r) ? f.filter(x => x !== r) : [...f, r]));
 
-    const { posts, error, isLoading, hasMore, loadMore } =
-        useInfinitePosts<PostBatch>(getKey(filters), {
-            pageSize: PAGE_SIZE,
-            maxItems: MAX_POSTS,
-            revalidateOnFocus: false,
-        });
+    const { posts, error, isLoading, hasMore, loadMore } = useInfinitePosts<
+        number,
+        PostBatch
+    >(getKey(filters), {
+        pageSize: PAGE_SIZE,
+        maxItems: MAX_POSTS,
+        revalidateOnFocus: false,
+    });
 
     if (error) return <Center h="100vh">Failed to load posts! 😢</Center>;
 

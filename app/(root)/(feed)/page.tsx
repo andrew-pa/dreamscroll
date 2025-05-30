@@ -28,12 +28,14 @@ const getKey = (_pageIndex: number, prev: PostBatch | null) =>
           (prev?.next ? `&cursor=${prev.next}` : "");
 
 export default function FeedPage() {
-    const { posts, error, isLoading, hasMore, loadMore } =
-        useInfinitePosts<PostBatch>(getKey, {
-            pageSize: PAGE_SIZE,
-            maxItems: MAX_POSTS,
-            revalidateOnFocus: false,
-        });
+    const { posts, error, isLoading, hasMore, loadMore } = useInfinitePosts<
+        string,
+        PostBatch
+    >(getKey, {
+        pageSize: PAGE_SIZE,
+        maxItems: MAX_POSTS,
+        revalidateOnFocus: false,
+    });
 
     if (error) return <Center h="100vh">Failed to load new posts! 😢</Center>;
 

@@ -6,11 +6,16 @@ import { IGeneratorRepository, GeneratorRecord } from "./generatorRepository";
 /** Concrete Drizzle implementation */
 export class DrizzleGeneratorRepository implements IGeneratorRepository {
     async list(type?: GeneratorType): Promise<GeneratorRecord[]> {
-        let stmt = db.select().from(generators);
         if (type) {
-            stmt = stmt.where(eq(generators.type, type));
+            const r = await db
+                .select()
+                .from(generators)
+                .where(eq(generators.type, type))
+                .all();
+            return r as GeneratorRecord[];
         }
-        return (await stmt.all()) as GeneratorRecord[];
+        const r = await db.select().from(generators).all();
+        return r as GeneratorRecord[];
     }
 
     async create(input: {
