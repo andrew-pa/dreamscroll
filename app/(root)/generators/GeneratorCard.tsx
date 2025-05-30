@@ -32,8 +32,9 @@ export default function GeneratorCard({ g }: { g: GeneratorRecord }) {
         try {
             JSON.parse(configText);
             return { parsedOk: true };
-        } catch (e: any) {
-            return { parsedOk: false, parseError: e.toString() };
+        } catch (e) {
+            const errorMessage = e instanceof Error ? e.message : String(e);
+            return { parsedOk: false, parseError: errorMessage };
         }
     }, [configText]);
 

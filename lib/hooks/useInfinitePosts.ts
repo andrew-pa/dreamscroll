@@ -22,7 +22,7 @@ interface UseInfinitePostsOptions {
  * @returns { posts, error, isLoading, hasMore, loadMore }
  */
 export function useInfinitePosts<
-    TBatch extends { page: TItem[]; next: any },
+    TBatch extends { page: TItem[]; next: number | null },
     TItem = TBatch["page"][0],
 >(
     getKey: (pageIndex: number, prev: TBatch | null) => string | null,
@@ -34,7 +34,7 @@ export function useInfinitePosts<
         revalidateOnFocus = false,
     } = options;
 
-    const { data, error, size, setSize, isValidating, mutate } =
+    const { data, error, setSize, isValidating, mutate } =
         useSWRInfinite<TBatch>(
             getKey,
             (url: string) => fetch(url).then(r => r.json()),
@@ -69,7 +69,7 @@ export function useInfinitePosts<
                     : old,
             );
         }
-    }, [posts.length, pageSize, maxItems, mutate]);
+    }, [posts, pageSize, maxItems, mutate]);
 
     return {
         posts,

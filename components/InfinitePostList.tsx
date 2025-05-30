@@ -37,7 +37,7 @@ export default function InfinitePostList({
                 {isLoading && <Spinner size="sm" />}
                 {!hasMore && posts.length > 0 && !isLoading && (
                     <Box fontSize="sm" color="fg.muted">
-                        ~ and that's the end! ~
+                        ~ and that&apos;s the end! ~
                     </Box>
                 )}
                 {posts.length === 0 && !isLoading && (

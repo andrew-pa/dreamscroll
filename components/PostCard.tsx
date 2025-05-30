@@ -37,7 +37,8 @@ export default function PostCard({ post }: Props) {
     useEffect(() => {
         if (
             !inView &&
-            entry?.boundingClientRect.top! < 0 &&
+            entry &&
+            entry.boundingClientRect.top < 0 &&
             !hasMarked.current
         ) {
             fetch(`/api/posts/${post.id}/seen`, { method: "POST" });

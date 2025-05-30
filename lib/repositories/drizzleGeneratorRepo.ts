@@ -6,7 +6,7 @@ import { IGeneratorRepository, GeneratorRecord } from "./generatorRepository";
 /** Concrete Drizzle implementation */
 export class DrizzleGeneratorRepository implements IGeneratorRepository {
     async list(type?: GeneratorType): Promise<GeneratorRecord[]> {
-        let stmt: any = db.select().from(generators);
+        let stmt = db.select().from(generators);
         if (type) {
             stmt = stmt.where(eq(generators.type, type));
         }

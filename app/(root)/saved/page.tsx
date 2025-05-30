@@ -1,6 +1,6 @@
 "use client";
 
-import { Center, VStack } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { useState } from "react";
 import { useInfinitePosts } from "@/lib/hooks/useInfinitePosts";
 import { PostRecord, Reaction } from "@/lib/repositories/postRepository";

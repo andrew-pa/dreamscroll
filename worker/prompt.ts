@@ -137,8 +137,7 @@ export class Prompt {
                             `Default provider for "${key}" returned fewer than ${actualCount} item(s)`,
                         );
                     }
-                    result +=
-                        actualCount === 1 ? words[0] : words.join(", ");
+                    result += actualCount === 1 ? words[0] : words.join(", ");
                 }
             }
         }
@@ -175,7 +174,9 @@ export class Prompt {
                 countRaw = parts[1];
             } else if (parts.length === 3) {
                 if (parts[2] !== "?")
-                    throw new SyntaxError(`Bad placeholder syntax in "${m[0]}"`);
+                    throw new SyntaxError(
+                        `Bad placeholder syntax in "${m[0]}"`,
+                    );
                 random = true;
                 countRaw = parts[1];
             } else {

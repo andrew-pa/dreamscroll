@@ -1,18 +1,6 @@
 import { db } from "@/lib/db";
 import { posts, type Reaction } from "@/lib/db/schema";
-import {
-    eq,
-    sql,
-    asc,
-    desc,
-    and,
-    gt,
-    gte,
-    lte,
-    inArray,
-    isNotNull,
-    notInArray,
-} from "drizzle-orm";
+import { eq, sql, asc, desc, and, gt, gte, lte, inArray } from "drizzle-orm";
 import type {
     CreatePostRecord,
     Cursor,
