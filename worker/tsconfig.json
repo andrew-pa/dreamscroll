@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "../dist/worker",
+        "outDir": "../dist",
         "rootDir": "..",
         "target": "ESNext",
         "lib": ["esnext"],
@@ -17,9 +17,9 @@
         "incremental": true,
         "plugins": [],
         "paths": {
-            "@/*": ["./*", "../lib/*"]
+            "@/*": ["../*"]
         }
     },
-    "include": ["**/*.ts", "../lib/**/*.ts"],
-    "exclude": ["node_modules"]
+    "include": ["**/*.ts", "../lib/**/*.ts", "../types/**/*.ts"],
+    "exclude": ["node_modules", "../lib/hooks"]
 }

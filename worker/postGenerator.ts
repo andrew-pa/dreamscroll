@@ -1,4 +1,4 @@
-import { CreatePostRecord } from "@/repositories/postRepository";
+import { CreatePostRecord } from "@/lib/repositories/postRepository";
 
 export abstract class PostGenerator {
     public abstract generatePosts(
