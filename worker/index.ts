@@ -2,6 +2,9 @@ import { GENERATOR_TYPES, GeneratorType } from "../lib/db/schema";
 import { getGeneratorRepository, getPostRepository } from "../lib/repositories";
 import { CreatePostRecord } from "../lib/repositories/postRepository";
 import { TextPostGenerator } from "./textPostGenerator";
+import { PicturePostGenerator } from "./imgPostGenerator";
+import { ImageGenClient } from "../lib/imageGenClient";
+import { FsImageRepo } from "../lib/repositories/impl/fsImageRepo";
 
 const generatorsRepo = getGeneratorRepository();
 const postsRepo = getPostRepository();
@@ -14,19 +17,9 @@ export interface PostGenerator {
     ): Promise<CreatePostRecord[]>;
 }
 
-class PicturePostGenerator implements PostGenerator {
-    async generatePosts(
-        id: number,
-        name: string,
-        config: unknown,
-    ): Promise<CreatePostRecord[]> {
-        throw new Error("Method not implemented.");
-    }
-}
-
 const generatorImpls: Record<GeneratorType, PostGenerator> = {
     text: new TextPostGenerator(),
-    picture: new PicturePostGenerator(),
+    picture: new PicturePostGenerator(new ImageGenClient(), new FsImageRepo()),
 };
 
 async function main() {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getImageRepository } from "@/lib/repositories";
 import { MIMEType } from "util";
+import { Readable } from "stream";
+import { ReadableStream as NodeReadableStream } from "stream/web";
 
 export const runtime = "nodejs"; // needs Node fs
 export const maxDuration = 30; // Vercel Run‑time guard
@@ -43,8 +45,10 @@ export async function PUT(
             { status: 400 },
         );
 
+    const bodyStream = Readable.fromWeb(req.body as unknown as NodeReadableStream);
+
     try {
-        await repo.put(filename, ct, req.body);
+        await repo.put(filename, ct, bodyStream);
         return NextResponse.json({ ok: true }, { status: 201 });
     } catch (err) {
         console.error(err);
@@ -69,7 +73,7 @@ export async function GET(
     const img = await repo.get(filename);
     if (!img) return new NextResponse(null, { status: 404 });
     const { body, contentType, size, etag } = img;
-    return new NextResponse(body, {
+    return new NextResponse(Readable.toWeb(body) as unknown as ReadableStream, {
         status: 200,
         headers: {
             "Content-Type": contentType.toString(),

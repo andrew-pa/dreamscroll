@@ -3,7 +3,6 @@ import { createWriteStream, createReadStream } from "node:fs";
 import { pipeline } from "node:stream/promises";
 import { extname, resolve } from "node:path";
 import { Readable } from "stream";
-import { ReadableStream as NodeReadableStream } from "stream/web";
 import { MIMEType } from "util";
 import { IImageRepository, StoredImage } from "../imageRepository";
 
@@ -23,20 +22,18 @@ export class FsImageRepo implements IImageRepository {
     }
 
     async put(
-        id: string,
+        filename: string,
         contentType: MIMEType,
-        body: ReadableStream,
+        body: Readable,
     ): Promise<void> {
         if (contentType.type !== "image") throw new Error("only images!");
-        const filename = `${id}.${contentType.subtype}`;
+        if (extname(filename).substring(1) !== contentType.subtype) throw new Error("filename extention does not match mimetype")
         const ws = createWriteStream(pathFor(filename), {
             flags: "w",
             encoding: "binary",
         });
         await pipeline(
-            Readable.fromWeb(body as unknown as NodeReadableStream, {
-                encoding: "binary",
-            }),
+            body,
             ws,
         );
     }
@@ -50,7 +47,7 @@ export class FsImageRepo implements IImageRepository {
             const contentType = new MIMEType(`image/${ext}`);
             return {
                 contentType,
-                body: Readable.toWeb(createReadStream(full)) as ReadableStream,
+                body: createReadStream(full),
                 size: st.size,
                 etag: `"${st.mtimeMs.toString(16)}-${st.size.toString(16)}"`,
             };
