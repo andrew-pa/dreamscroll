@@ -8,8 +8,8 @@ import type {
     PostBatch,
     PostRecord,
     ScoringParams,
-} from "./postRepository";
-import { pagenatedPosts, scorePosts } from "../scorePosts";
+} from "../postRepository";
+import { pagenatedPosts, scorePosts } from "@/lib/scorePosts";
 
 const HOUR = 3_600_000; // ms → hour
 

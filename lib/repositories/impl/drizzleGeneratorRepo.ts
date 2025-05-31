@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { generators, GeneratorType } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { IGeneratorRepository, GeneratorRecord } from "./generatorRepository";
+import { IGeneratorRepository, GeneratorRecord } from "../generatorRepository";
 
 /** Concrete Drizzle implementation */
 export class DrizzleGeneratorRepository implements IGeneratorRepository {
