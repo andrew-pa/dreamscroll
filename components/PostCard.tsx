@@ -13,6 +13,7 @@ import { AiOutlineDislike, AiOutlineLike, AiFillHeart } from "react-icons/ai";
 import { useInView } from "react-intersection-observer";
 import { useState, useEffect, useRef } from "react";
 import { PostRecord, Reaction } from "@/lib/repositories/postRepository";
+import Markdown from "react-markdown";
 
 interface Props {
     post: PostRecord;
@@ -79,7 +80,7 @@ export default function PostCard({ post }: Props) {
 
             {post.body && (
                 <Text mb={2} whiteSpace="pre-wrap">
-                    {post.body}
+                    <Markdown>{post.body}</Markdown>
                 </Text>
             )}
 
@@ -89,7 +90,7 @@ export default function PostCard({ post }: Props) {
                 </ChakraLink>
             )}
 
-            <HStack mt={3} gap={3} justify="right">
+            <HStack mt={2} gap={3} justify="right">
                 <IconButton
                     aria-label="dislike"
                     size="sm"
