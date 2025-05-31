@@ -45,7 +45,9 @@ export async function PUT(
             { status: 400 },
         );
 
-    const bodyStream = Readable.fromWeb(req.body as unknown as NodeReadableStream);
+    const bodyStream = Readable.fromWeb(
+        req.body as unknown as NodeReadableStream,
+    );
 
     try {
         await repo.put(filename, ct, bodyStream);

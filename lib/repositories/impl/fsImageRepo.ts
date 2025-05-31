@@ -27,15 +27,13 @@ export class FsImageRepo implements IImageRepository {
         body: Readable,
     ): Promise<void> {
         if (contentType.type !== "image") throw new Error("only images!");
-        if (extname(filename).substring(1) !== contentType.subtype) throw new Error("filename extention does not match mimetype")
+        if (extname(filename).substring(1) !== contentType.subtype)
+            throw new Error("filename extention does not match mimetype");
         const ws = createWriteStream(pathFor(filename), {
             flags: "w",
             encoding: "binary",
         });
-        await pipeline(
-            body,
-            ws,
-        );
+        await pipeline(body, ws);
     }
 
     async get(filename: string): Promise<StoredImage | null> {
