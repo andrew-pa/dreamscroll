@@ -1,6 +1,4 @@
-import { CreatePostRecord } from "../lib/repositories/postRepository";
-import { PostGenerator } from ".";
-import { isPromptDef, Prompt, PromptDef } from "./prompt";
+import { isPromptDef, PromptDef } from "./prompt";
 import OpenAI from "openai";
 import { BaseAIPostGenerator, PostContents } from "./baseAIPostGenerator";
 
@@ -36,7 +34,6 @@ const SYSTEM_MESSAGE =
 const MODEL_NAME = process.env.TEXT_GEN_MODEL ?? "gemma3:27b";
 
 export class TextPostGenerator extends BaseAIPostGenerator<TextGeneratorConfig> {
-    
     private client: OpenAI;
 
     constructor() {
@@ -67,5 +64,24 @@ export class TextPostGenerator extends BaseAIPostGenerator<TextGeneratorConfig> 
         ).trim();
 
         return { body };
+    }
+
+    public async cleanup(): Promise<void> {
+        // HACK: tell ollama to unload because we know we are cheapskates but also don't have enough vRAM to load everything at once. We should do this properly but speed is key.
+        const url = new URL(this.client.baseURL);
+        url.pathname = "/api/generate";
+        console.log("unloading ollama @ ", url);
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                model: MODEL_NAME,
+                prompt: "",
+                keep_alive: 0,
+            }),
+        });
+        console.log("ollama unload response:", res.status);
     }
 }

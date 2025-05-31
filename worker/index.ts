@@ -1,25 +1,17 @@
 import { GENERATOR_TYPES, GeneratorType } from "../lib/db/schema";
 import { getGeneratorRepository, getPostRepository } from "../lib/repositories";
-import { CreatePostRecord } from "../lib/repositories/postRepository";
 import { TextPostGenerator } from "./textPostGenerator";
-import { PicturePostGenerator } from "./imgPostGenerator";
+import { ImagePostGenerator } from "./imgPostGenerator";
 import { ImageGenClient } from "../lib/imageGenClient";
 import { FsImageRepo } from "../lib/repositories/impl/fsImageRepo";
+import { PostGenerator } from "./postGenerator";
 
 const generatorsRepo = getGeneratorRepository();
 const postsRepo = getPostRepository();
 
-export interface PostGenerator {
-    generatePosts(
-        id: number,
-        name: string,
-        config: unknown,
-    ): Promise<CreatePostRecord[]>;
-}
-
 const generatorImpls: Record<GeneratorType, PostGenerator> = {
     text: new TextPostGenerator(),
-    picture: new PicturePostGenerator(new ImageGenClient(), new FsImageRepo()),
+    picture: new ImagePostGenerator(new ImageGenClient(), new FsImageRepo()),
 };
 
 async function main() {
@@ -43,6 +35,7 @@ async function main() {
                 console.log(`\tfailed to run generator: ${e}`);
             }
         }
+        await generatorImpls[type].cleanup();
     }
 }
 

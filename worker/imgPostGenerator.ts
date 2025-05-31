@@ -1,11 +1,9 @@
-import { CreatePostRecord } from "../lib/repositories/postRepository";
-import { PostGenerator } from ".";
-import { isPromptDef, Prompt, PromptDef } from "./prompt";
+import { isPromptDef, PromptDef } from "./prompt";
 import { ImageGenClient } from "../lib/imageGenClient";
 import { randomUUID } from "crypto";
 import { IImageRepository } from "../lib/repositories/imageRepository";
 import { MIMEType } from "util";
-import { BaseAIPostGenerator, MkPostFn, PostContents } from "./baseAIPostGenerator";
+import { BaseAIPostGenerator, PostContents } from "./baseAIPostGenerator";
 
 interface ImageGeneratorConfig {
     numPosts: number;
@@ -17,46 +15,46 @@ interface ImageGeneratorConfig {
 }
 
 export function isImageGeneratorConfig(x: unknown): x is ImageGeneratorConfig {
-  if (typeof x !== 'object' || x === null) return false;
-  const obj = x as Record<string, unknown>;
+    if (typeof x !== "object" || x === null) return false;
+    const obj = x as Record<string, unknown>;
 
-  // numPosts: required number
-  if (typeof obj.numPosts !== 'number') return false;
+    // numPosts: required number
+    if (typeof obj.numPosts !== "number") return false;
 
-  // prompt: required PromptDef
-  if (!('prompt' in obj)) return false;
-  if (!isPromptDef(obj.prompt)) return false;
+    // prompt: required PromptDef
+    if (!("prompt" in obj)) return false;
+    if (!isPromptDef(obj.prompt)) return false;
 
-  // optional temperature: must be number if present
-  if ('temperature' in obj) {
-    const t = obj.temperature;
-    if (t !== undefined && typeof t !== 'number') return false;
-  }
+    // optional temperature: must be number if present
+    if ("temperature" in obj) {
+        const t = obj.temperature;
+        if (t !== undefined && typeof t !== "number") return false;
+    }
 
-  // optional negative_prompt: must be string if present
-  if ('negative_prompt' in obj) {
-    const np = obj.negative_prompt;
-    if (np !== undefined && typeof np !== 'string') return false;
-  }
+    // optional negative_prompt: must be string if present
+    if ("negative_prompt" in obj) {
+        const np = obj.negative_prompt;
+        if (np !== undefined && typeof np !== "string") return false;
+    }
 
-  // optional steps: must be number if present
-  if ('steps' in obj) {
-    const s = obj.steps;
-    if (s !== undefined && typeof s !== 'number') return false;
-  }
+    // optional steps: must be number if present
+    if ("steps" in obj) {
+        const s = obj.steps;
+        if (s !== undefined && typeof s !== "number") return false;
+    }
 
-  // optional guidance_scale: must be number if present
-  if ('guidance_scale' in obj) {
-    const gs = obj.guidance_scale;
-    if (gs !== undefined && typeof gs !== 'number') return false;
-  }
+    // optional guidance_scale: must be number if present
+    if ("guidance_scale" in obj) {
+        const gs = obj.guidance_scale;
+        if (gs !== undefined && typeof gs !== "number") return false;
+    }
 
-  return true;
+    return true;
 }
 
 const MODEL_NAME = process.env.IMG_GEN_MODEL ?? "sd3.5";
 
-export class PicturePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig> {
+export class ImagePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig> {
     private client: ImageGenClient;
     private imgRepo: IImageRepository;
 
@@ -83,10 +81,14 @@ export class PicturePostGenerator extends BaseAIPostGenerator<ImageGeneratorConf
             negative_prompt: config.negative_prompt,
             guidance_scale: config.guidance_scale,
             steps: config.steps,
-            output_format: 'jpg'
+            output_format: "jpg",
         });
 
-        await this.imgRepo.put(filename, new MIMEType("image/jpg"), imageStream);
+        await this.imgRepo.put(
+            filename,
+            new MIMEType("image/jpg"),
+            imageStream,
+        );
 
         return {
             imageUrl,
