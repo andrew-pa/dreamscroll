@@ -2,6 +2,7 @@ import { CreatePostRecord } from "../lib/repositories/postRepository";
 import { PostGenerator } from ".";
 import { isPromptDef, Prompt, PromptDef } from "./prompt";
 import OpenAI from "openai";
+import { BaseAIPostGenerator, PostContents } from "./baseAIPostGenerator";
 
 interface TextGeneratorConfig {
     numPosts: number;
@@ -34,41 +35,23 @@ const SYSTEM_MESSAGE =
 
 const MODEL_NAME = process.env.TEXT_GEN_MODEL ?? "gemma3:27b";
 
-export class TextPostGenerator implements PostGenerator {
+export class TextPostGenerator extends BaseAIPostGenerator<TextGeneratorConfig> {
+    
     private client: OpenAI;
 
     constructor() {
+        super();
         this.client = new OpenAI();
     }
 
-    async generatePosts(
-        id: number,
-        name: string,
-        rawConfig: unknown,
-    ): Promise<CreatePostRecord[]> {
-        if (!isTextGeneratorConfig(rawConfig)) {
-            throw new Error(
-                "configuration invalid: " + JSON.stringify(rawConfig),
-            );
-        }
-
-        const config = rawConfig as TextGeneratorConfig;
-
-        const prompts = await new Prompt(config.prompt).sample(config.numPosts);
-
-        return await Promise.all(
-            prompts.map(p => this.generatePost(id, name, config, p)),
-        );
+    protected validateConfig(config: unknown): config is TextGeneratorConfig {
+        return isTextGeneratorConfig(config);
     }
 
-    async generatePost(
-        id: number,
-        name: string,
+    protected async generatePost(
         config: TextGeneratorConfig,
         prompt: string,
-    ): Promise<CreatePostRecord> {
-        console.log(prompt);
-
+    ): Promise<PostContents> {
         const resp = await this.client.chat.completions.create({
             model: MODEL_NAME,
             temperature: config.temperature,
@@ -83,13 +66,6 @@ export class TextPostGenerator implements PostGenerator {
             "no content returned from API!"
         ).trim();
 
-        console.log(body);
-
-        return {
-            generatorId: id,
-            generatorName: name,
-            timestamp: new Date(),
-            body,
-        };
+        return { body };
     }
 }

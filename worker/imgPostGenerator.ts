@@ -5,6 +5,7 @@ import { ImageGenClient } from "../lib/imageGenClient";
 import { randomUUID } from "crypto";
 import { IImageRepository } from "../lib/repositories/imageRepository";
 import { MIMEType } from "util";
+import { BaseAIPostGenerator, MkPostFn, PostContents } from "./baseAIPostGenerator";
 
 interface ImageGeneratorConfig {
     numPosts: number;
@@ -55,41 +56,24 @@ export function isImageGeneratorConfig(x: unknown): x is ImageGeneratorConfig {
 
 const MODEL_NAME = process.env.IMG_GEN_MODEL ?? "sd3.5";
 
-export class PicturePostGenerator implements PostGenerator {
+export class PicturePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig> {
     private client: ImageGenClient;
     private imgRepo: IImageRepository;
 
     constructor(genClient: ImageGenClient, imageRepo: IImageRepository) {
+        super();
         this.client = genClient;
         this.imgRepo = imageRepo;
     }
 
-    async generatePosts(
-        id: number,
-        name: string,
-        rawConfig: unknown,
-    ): Promise<CreatePostRecord[]> {
-        if (!isImageGeneratorConfig(rawConfig)) {
-            throw new Error(
-                "configuration invalid: " + JSON.stringify(rawConfig),
-            );
-        }
-
-        const config = rawConfig as ImageGeneratorConfig;
-
-        const prompts = await new Prompt(config.prompt).sample(config.numPosts);
-
-        return await Promise.all(
-            prompts.map(p => this.generatePost(id, name, config, p)),
-        );
+    protected validateConfig(config: unknown): config is ImageGeneratorConfig {
+        return isImageGeneratorConfig(config);
     }
 
-    async generatePost(
-        id: number,
-        name: string,
+    protected async generatePost(
         config: ImageGeneratorConfig,
         prompt: string,
-    ): Promise<CreatePostRecord> {
+    ): Promise<PostContents> {
         const filename = `${randomUUID()}.jpg`;
         const imageUrl = `/api/images/${filename}`;
 
@@ -105,9 +89,6 @@ export class PicturePostGenerator implements PostGenerator {
         await this.imgRepo.put(filename, new MIMEType("image/jpg"), imageStream);
 
         return {
-            generatorId: id,
-            generatorName: name,
-            timestamp: new Date(),
             imageUrl,
             body: config.include_prompt_in_post ? prompt : undefined,
         };
