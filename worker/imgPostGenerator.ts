@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { IImageRepository } from "../lib/repositories/imageRepository";
 import { MIMEType } from "util";
 import { BaseAIPostGenerator, PostContents } from "./baseAIPostGenerator";
+import { CreatePostRecord } from "@/lib/repositories/postRepository";
 
 interface ImageGeneratorConfig {
     numPosts: number;
@@ -62,6 +63,27 @@ export class ImagePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig
         super();
         this.client = genClient;
         this.imgRepo = imageRepo;
+    }
+
+    public async generatePosts(
+        id: number,
+        name: string,
+        rawConfig: unknown,
+    ): Promise<CreatePostRecord[]> {
+        console.log("checking for image generator health")
+        for(let i = 0; i < 20; ++i) {
+            let health = null;
+            try {
+                health = await this.client.getHealth();
+            } catch(e) {
+                continue;
+            }
+            console.log("got health check result", health);
+            if(health.status == "ok") {
+                return super.generatePosts(id, name, rawConfig);
+            }
+        }
+        throw new Error("image generator service failed to health check after 20 attempts");
     }
 
     protected validateConfig(config: unknown): config is ImageGeneratorConfig {

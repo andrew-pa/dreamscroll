@@ -38,16 +38,20 @@ export abstract class BaseAIPostGenerator<
         const posts = [];
 
         for (const p of prompts) {
-            const { imageUrl, body } = await this.generatePost(config, p);
-            posts.push({
-                generatorId: id,
-                generatorName: name,
-                timestamp: new Date(
-                    startTime + Math.random() * POST_TIME_SPREAD,
-                ),
-                imageUrl,
-                body,
-            });
+            try {
+                const { imageUrl, body } = await this.generatePost(config, p);
+                posts.push({
+                    generatorId: id,
+                    generatorName: name,
+                    timestamp: new Date(
+                        startTime + Math.random() * POST_TIME_SPREAD,
+                    ),
+                    imageUrl,
+                    body,
+                });
+            } catch(e) {
+                console.log("failed to generate post", e);
+            }
         }
 
         return posts;

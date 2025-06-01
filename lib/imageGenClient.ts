@@ -45,7 +45,7 @@ export class ImageGenClient {
     constructor({
         baseUrl = process.env.IMAGE_GEN_BASE_URL ?? "http://localhost:3333",
         timeoutMs = 300_000,
-        retries = 5,
+        retries = 10,
     }: ClientOptions = {}) {
         this.timeoutMs = timeoutMs;
         this.client = got.extend({
