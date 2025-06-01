@@ -70,20 +70,23 @@ export class ImagePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig
         name: string,
         rawConfig: unknown,
     ): Promise<CreatePostRecord[]> {
-        console.log("checking for image generator health")
-        for(let i = 0; i < 20; ++i) {
+        console.log("checking for image generator health");
+        for (let i = 0; i < 20; ++i) {
             let health = null;
             try {
                 health = await this.client.getHealth();
-            } catch(e) {
+            } catch (e) {
+                console.log("health check failed:", e);
                 continue;
             }
             console.log("got health check result", health);
-            if(health.status == "ok") {
+            if (health.status === "ok") {
                 return super.generatePosts(id, name, rawConfig);
             }
         }
-        throw new Error("image generator service failed to health check after 20 attempts");
+        throw new Error(
+            "image generator service failed to health check after 20 attempts",
+        );
     }
 
     protected validateConfig(config: unknown): config is ImageGeneratorConfig {

@@ -70,7 +70,7 @@ export class TextPostGenerator extends BaseAIPostGenerator<TextGeneratorConfig> 
         // HACK: tell ollama to unload because we know we are cheapskates but also don't have enough vRAM to load everything at once. We should do this properly but speed is key.
         const url = new URL(this.client.baseURL);
         url.pathname = "/api/generate";
-        console.log("unloading ollama @ ", url);
+        console.log("unloading ollama @ ", this.client.baseURL);
         const res = await fetch(url, {
             method: "POST",
             headers: {

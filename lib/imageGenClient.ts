@@ -73,11 +73,11 @@ export class ImageGenClient {
 
     /** Ping `/health` for models-loaded & concurrency info. */
     async getHealth(): Promise<HealthResponse> {
-        const res = await this.client.get("health");
+        const res = await this.client.get<HealthResponse>("health");
         if (res.statusCode < 200 || res.statusCode >= 300) {
             throw new HTTPError(res);
         }
-        return JSON.parse(res.body) as HealthResponse;
+        return res.body as HealthResponse;
     }
 
     /**

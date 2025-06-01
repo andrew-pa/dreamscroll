@@ -49,7 +49,7 @@ export abstract class BaseAIPostGenerator<
                     imageUrl,
                     body,
                 });
-            } catch(e) {
+            } catch (e) {
                 console.log("failed to generate post", e);
             }
         }
