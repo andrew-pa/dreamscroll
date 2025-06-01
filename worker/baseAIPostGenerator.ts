@@ -35,15 +35,22 @@ export abstract class BaseAIPostGenerator<
 
         const startTime = Date.now();
 
-        return (
-            await Promise.all(prompts.map(p => this.generatePost(config, p)))
-        ).map(({ imageUrl, body }: PostContents) => ({
-            generatorId: id,
-            generatorName: name,
-            timestamp: new Date(startTime + Math.random() * POST_TIME_SPREAD),
-            imageUrl,
-            body,
-        }));
+        const posts = [];
+
+        for (const p of prompts) {
+            const { imageUrl, body } = await this.generatePost(config, p);
+            posts.push({
+                generatorId: id,
+                generatorName: name,
+                timestamp: new Date(
+                    startTime + Math.random() * POST_TIME_SPREAD,
+                ),
+                imageUrl,
+                body,
+            });
+        }
+
+        return posts;
     }
 
     protected abstract validateConfig(config: unknown): config is TConfig;
