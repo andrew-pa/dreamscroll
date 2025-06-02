@@ -20,7 +20,6 @@ export interface ImageGenerateParams {
     height?: number;
     steps?: number;
     seed?: number;
-    output_format?: "jpg" | "png";
 }
 
 export interface HealthResponse {

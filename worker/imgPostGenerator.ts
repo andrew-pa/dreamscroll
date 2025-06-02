@@ -53,7 +53,7 @@ export function isImageGeneratorConfig(x: unknown): x is ImageGeneratorConfig {
     return true;
 }
 
-const MODEL_NAME = process.env.IMG_GEN_MODEL ?? "sd3.5";
+const MODEL_NAME = process.env.IMG_GEN_MODEL ?? "stabilityai/stable-diffusion-3.5-medium";
 
 export class ImagePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig> {
     private client: ImageGenClient;
@@ -106,7 +106,6 @@ export class ImagePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig
             negative_prompt: config.negative_prompt,
             guidance_scale: config.guidance_scale,
             steps: config.steps,
-            output_format: "jpg",
         });
 
         await this.imgRepo.put(

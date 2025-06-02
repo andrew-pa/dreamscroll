@@ -16,9 +16,8 @@ const generatorImpls: Record<GeneratorType, PostGenerator> = {
 
 async function main() {
     for (const type of GENERATOR_TYPES) {
-        console.log(`\nrunning ${type} generator`);
         const gens = await generatorsRepo.list(type);
-        console.log(`got ${gens.length} generator configs`);
+        console.log(`\nrunning ${type} generator, got ${gens.length} configs`);
         for (const g of gens) {
             const runTime = new Date();
             console.log(`running generator #${g.id} (${g.name}) @ ${runTime}`);
