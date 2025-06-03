@@ -12,8 +12,8 @@ export interface PostContents {
     body?: string;
 }
 
-// 2 hours
-const POST_TIME_SPREAD = 2 * 3600 * 1000;
+// 4 hours
+const POST_TIME_SPREAD = 4 * 3600 * 1000;
 
 export abstract class BaseAIPostGenerator<
     TConfig extends BaseAIPostGeneratorConfig,
@@ -33,8 +33,6 @@ export abstract class BaseAIPostGenerator<
 
         const prompts = await new Prompt(config.prompt).sample(config.numPosts);
 
-        const startTime = Date.now();
-
         const posts = [];
 
         for (const p of prompts) {
@@ -44,7 +42,7 @@ export abstract class BaseAIPostGenerator<
                     generatorId: id,
                     generatorName: name,
                     timestamp: new Date(
-                        startTime + Math.random() * POST_TIME_SPREAD,
+                        Date.now() + Math.random() * POST_TIME_SPREAD,
                     ),
                     imageUrl,
                     body,

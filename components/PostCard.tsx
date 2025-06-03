@@ -79,7 +79,7 @@ export default function PostCard({ post }: Props) {
             )}
 
             {post.body && (
-                <Text mb={2} whiteSpace="pre-wrap">
+                <Text mb={2} whiteSpace="pre-wrap" textWrap="pretty">
                     <Markdown>{post.body}</Markdown>
                 </Text>
             )}
