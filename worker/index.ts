@@ -46,28 +46,18 @@ async function main() {
                     g.name,
                     g.config,
                 );
+                console.log(`\tgenerated ${posts.length} posts`);
+                await postsRepo.createMany(posts);
+                postsMade += posts.length;
+                success++;
                 await generatorsRepo.finishRun(g.id, start, {
                     end: new Date(),
                     posts: posts.length,
                     outcome: "success",
                 });
-                await postsRepo.createMany(posts);
-                postsMade += posts.length;
-                success++;
-                await runsRepo.update(start, {
-                    lastUpdate: new Date(),
-                    successCount: success,
-                    postCount: postsMade,
-                });
-                console.log(`\tgenerated ${posts.length} posts`);
             } catch (e) {
                 fail++;
                 failed.push(g.id);
-                await runsRepo.update(start, {
-                    lastUpdate: new Date(),
-                    failCount: fail,
-                    failedIds: [...failed],
-                });
                 console.log(`\tfailed to run generator: ${e}`);
                 await generatorsRepo.finishRun(g.id, start, {
                     end: new Date(),
@@ -76,9 +66,18 @@ async function main() {
                     error: e instanceof Error ? e.message : String(e),
                 });
             }
+            await runsRepo.update(start, {
+                lastUpdate: new Date(),
+                successCount: success,
+                failCount: fail,
+                failedIds: failed,
+                postCount: postsMade,
+            });
         }
         await generatorImpls[type].cleanup();
     }
+
+    console.log(`${success} generators succeeded, ${fail} failed: ${failed}`);
 
     await runsRepo.finish(start, new Date());
 }
