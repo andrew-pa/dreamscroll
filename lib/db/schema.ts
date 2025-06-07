@@ -74,3 +74,19 @@ export const generatorRuns = sqliteTable(
     },
     t => [primaryKey(t.generatorId, t.startTs)],
 );
+
+export const workerRuns = sqliteTable("worker_runs", {
+    startedAt: integer("started_at", { mode: "timestamp_ms" }).primaryKey(),
+    endedAt: integer("ended_at", { mode: "timestamp_ms" })
+        .$type<Date | null>()
+        .default(null),
+    lastUpdate: integer("last_update", { mode: "timestamp_ms" }).notNull(),
+    numGenerators: integer("num_generators").notNull(),
+    successCount: integer("success_count").notNull().default(0),
+    failCount: integer("fail_count").notNull().default(0),
+    postCount: integer("post_count").notNull().default(0),
+    failedIds: text("failed_ids", { mode: "json" })
+        .$type<number[]>()
+        .notNull()
+        .default([] as number[]),
+});
