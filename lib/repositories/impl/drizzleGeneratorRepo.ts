@@ -27,6 +27,16 @@ export class DrizzleGeneratorRepository implements IGeneratorRepository {
         return r as GeneratorRecord[];
     }
 
+    async get(id: number): Promise<GeneratorRecord | null> {
+        const r = await db
+            .select()
+            .from(generators)
+            .where(eq(generators.id, id))
+            .limit(1)
+            .all();
+        return (r[0] as GeneratorRecord | undefined) ?? null;
+    }
+
     async create(input: {
         name: string;
         type: GeneratorType;

@@ -11,13 +11,18 @@ import {
     Text,
     Textarea,
     HStack,
+    useDisclosure,
 } from "@chakra-ui/react";
-import { FiTrash } from "react-icons/fi";
+import { FiTrash, FiCopy, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useMemo, useState, useTransition } from "react";
 import type { JSX } from "react";
 import { useRouter } from "next/navigation";
 import { GeneratorWithRun } from "./actions";
-import { updateGenerator, deleteGenerator } from "./actions";
+import {
+    updateGenerator,
+    deleteGenerator,
+    duplicateGenerator,
+} from "./actions";
 import type { GeneratorRunRecord } from "@/lib/repositories";
 import { toaster } from "@/components/ui/toaster";
 
@@ -71,6 +76,10 @@ export default function GeneratorCard({ g }: { g: GeneratorWithRun }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
+    const { open: showConfig, onToggle } = useDisclosure({
+        defaultOpen: false,
+    });
+
     const [name, setName] = useState(g.name);
     const [configText, setConfigText] = useState(
         JSON.stringify(g.config, null, 2),
@@ -113,19 +122,38 @@ export default function GeneratorCard({ g }: { g: GeneratorWithRun }) {
         });
     };
 
+    const duplicate = () =>
+        startTransition(async () => {
+            await duplicateGenerator(g.id);
+            toaster.create({
+                type: "success",
+                description: `Duplicated “${g.name}”`,
+            });
+            router.refresh();
+        });
+
     return (
         <Card.Root>
             <CardHeader>
-                <HStack align="center" gap={4} justify="space-between">
+                <HStack align="center" gap={2} justify="space-between">
                     <Heading size="sm">#{g.id}</Heading>
-                    <IconButton
-                        aria-label="Delete generator"
-                        variant="ghost"
-                        colorScheme="red"
-                        onClick={destroy}
-                    >
-                        <FiTrash />
-                    </IconButton>
+                    <HStack gap={1}>
+                        <IconButton
+                            aria-label="Duplicate generator"
+                            variant="ghost"
+                            onClick={duplicate}
+                        >
+                            <FiCopy />
+                        </IconButton>
+                        <IconButton
+                            aria-label="Delete generator"
+                            variant="ghost"
+                            colorScheme="red"
+                            onClick={destroy}
+                        >
+                            <FiTrash />
+                        </IconButton>
+                    </HStack>
                 </HStack>
             </CardHeader>
 
@@ -145,16 +173,33 @@ export default function GeneratorCard({ g }: { g: GeneratorWithRun }) {
                 </Field.Root>
 
                 <Field.Root invalid={!parsedOk}>
-                    <Field.Label>Config (JSON)</Field.Label>
-                    <Textarea
-                        rows={8}
-                        fontFamily="mono"
-                        value={configText}
-                        onChange={e => setConfigText(e.target.value)}
-                    />
-                    <Field.ErrorText>
-                        Invalid JSON: {parseError}
-                    </Field.ErrorText>
+                    <HStack justify="space-between" align="center">
+                        <Field.Label>Config (JSON)</Field.Label>
+                        <IconButton
+                            aria-label={
+                                showConfig ? "Hide config" : "Show config"
+                            }
+                            size="sm"
+                            variant="ghost"
+                            onClick={onToggle}
+                        >
+                            {showConfig ? <FiChevronUp /> : <FiChevronDown />}
+                        </IconButton>
+                    </HStack>
+                    {showConfig && (
+                        <>
+                            <Textarea
+                                mt={2}
+                                rows={8}
+                                fontFamily="mono"
+                                value={configText}
+                                onChange={e => setConfigText(e.target.value)}
+                            />
+                            <Field.ErrorText>
+                                Invalid JSON: {parseError}
+                            </Field.ErrorText>
+                        </>
+                    )}
                 </Field.Root>
             </Card.Body>
 
