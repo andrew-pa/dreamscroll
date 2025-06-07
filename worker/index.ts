@@ -19,19 +19,30 @@ async function main() {
         const gens = await generatorsRepo.list(type);
         console.log(`\nrunning ${type} generator, got ${gens.length} configs`);
         for (const g of gens) {
-            const runTime = new Date();
-            console.log(`running generator #${g.id} (${g.name}) @ ${runTime}`);
+            const start = new Date();
+            console.log(`running generator #${g.id} (${g.name}) @ ${start}`);
+            await generatorsRepo.createRun(g.id, start);
             try {
                 const posts = await generatorImpls[type].generatePosts(
                     g.id,
                     g.name,
                     g.config,
                 );
-                await generatorsRepo.recordRun(g.id, runTime);
                 console.log(`\tgenerated ${posts.length} posts`);
                 await postsRepo.createMany(posts);
+                await generatorsRepo.finishRun(g.id, start, {
+                    end: new Date(),
+                    posts: posts.length,
+                    outcome: "success",
+                });
             } catch (e) {
                 console.log(`\tfailed to run generator: ${e}`);
+                await generatorsRepo.finishRun(g.id, start, {
+                    end: new Date(),
+                    posts: 0,
+                    outcome: "error",
+                    error: e instanceof Error ? e.message : String(e),
+                });
             }
         }
         await generatorImpls[type].cleanup();

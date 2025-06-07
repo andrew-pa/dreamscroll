@@ -14,12 +14,60 @@ import {
 } from "@chakra-ui/react";
 import { FiTrash } from "react-icons/fi";
 import { useMemo, useState, useTransition } from "react";
+import type { JSX } from "react";
 import { useRouter } from "next/navigation";
-import { GeneratorRecord } from "@/lib/repositories/generatorRepository";
+import { GeneratorWithRun } from "./actions";
 import { updateGenerator, deleteGenerator } from "./actions";
+import type { GeneratorRunRecord } from "@/lib/repositories";
 import { toaster } from "@/components/ui/toaster";
 
-export default function GeneratorCard({ g }: { g: GeneratorRecord }) {
+function RunInfo({ run }: { run: GeneratorRunRecord | null }): JSX.Element {
+    if (!run) {
+        return (
+            <Text>
+                <strong>Last run:</strong> never
+            </Text>
+        );
+    }
+    const duration = run.endTs
+        ? ((run.endTs.getTime() - run.startTs.getTime()) / 1000).toFixed(1)
+        : null;
+    return (
+        <>
+            <Text>
+                <strong>Last run:</strong>{" "}
+                {(run.endTs ?? run.startTs).toLocaleString()}
+            </Text>
+            {run.endTs ? (
+                <>
+                    <Text>
+                        <strong>Duration:</strong> {duration}s
+                    </Text>
+                    <Text>
+                        <strong>Posts:</strong> {run.posts ?? 0}
+                    </Text>
+                    <Text
+                        color={
+                            run.outcome === "success" ? "green.500" : "red.500"
+                        }
+                    >
+                        <strong>Outcome:</strong> {run.outcome}
+                    </Text>
+                    {run.error && (
+                        <details>
+                            <summary>Error</summary>
+                            <pre>{run.error}</pre>
+                        </details>
+                    )}
+                </>
+            ) : (
+                <Text color="orange.500">Run did not finish</Text>
+            )}
+        </>
+    );
+}
+
+export default function GeneratorCard({ g }: { g: GeneratorWithRun }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
@@ -86,10 +134,7 @@ export default function GeneratorCard({ g }: { g: GeneratorRecord }) {
                     <strong>Type:</strong> {g.type}
                 </Text>
 
-                <Text>
-                    <strong>Last run:</strong>{" "}
-                    {g.lastRun ? g.lastRun.toLocaleString() : "never"}
-                </Text>
+                <RunInfo run={g.lastRun} />
 
                 <Field.Root required>
                     <Field.Label>Name</Field.Label>

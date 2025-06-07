@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { getGeneratorRepository } from "@/lib/repositories";
-import { GeneratorType } from "@/lib/repositories/generatorRepository";
+import {
+    GeneratorType,
+    GeneratorRecord,
+    GeneratorRunRecord,
+} from "@/lib/repositories/generatorRepository";
 
 /* ─────────────────────────────────────────────────────────────── *
  *  All writes go through these actions → consistent, testable.    *
@@ -10,9 +14,15 @@ import { GeneratorType } from "@/lib/repositories/generatorRepository";
  *  automatically refetches and streams fresh HTML.                *
  * ─────────────────────────────────────────────────────────────── */
 
-export async function listGenerators() {
+export interface GeneratorWithRun extends GeneratorRecord {
+    lastRun: GeneratorRunRecord | null;
+}
+
+export async function listGenerators(): Promise<GeneratorWithRun[]> {
     const repo = getGeneratorRepository();
-    return await repo.list();
+    const gens = await repo.list();
+    const runs = await Promise.all(gens.map(g => repo.getLastRun(g.id)));
+    return gens.map((g, i) => ({ ...g, lastRun: runs[i] ?? null }));
 }
 
 export async function createGenerator(name: string, type: GeneratorType) {
