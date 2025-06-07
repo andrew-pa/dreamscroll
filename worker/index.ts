@@ -1,5 +1,10 @@
 import { GENERATOR_TYPES, GeneratorType } from "../lib/db/schema";
-import { getGeneratorRepository, getPostRepository } from "../lib/repositories";
+import type { GeneratorRecord } from "../lib/repositories";
+import {
+    getGeneratorRepository,
+    getPostRepository,
+    getWorkerRunRepository,
+} from "../lib/repositories";
 import { TextPostGenerator } from "./textPostGenerator";
 import { ImagePostGenerator } from "./imgPostGenerator";
 import { ImageGenClient } from "../lib/imageGenClient";
@@ -8,6 +13,7 @@ import { PostGenerator } from "./postGenerator";
 
 const generatorsRepo = getGeneratorRepository();
 const postsRepo = getPostRepository();
+const runsRepo = getWorkerRunRepository();
 
 const generatorImpls: Record<GeneratorType, PostGenerator> = {
     text: new TextPostGenerator(),
@@ -15,8 +21,27 @@ const generatorImpls: Record<GeneratorType, PostGenerator> = {
 };
 
 async function main() {
+    const lists: Record<GeneratorType, GeneratorRecord[]> = {
+        text: [],
+        picture: [],
+    };
+    let total = 0;
+    for (const t of GENERATOR_TYPES) {
+        const gens = await generatorsRepo.list(t);
+        lists[t] = gens;
+        total += gens.length;
+    }
+
+    const start = new Date();
+    await runsRepo.create({ startedAt: start, numGenerators: total });
+
+    let success = 0;
+    let fail = 0;
+    let postsMade = 0;
+    const failed: number[] = [];
+
     for (const type of GENERATOR_TYPES) {
-        const gens = await generatorsRepo.list(type);
+        const gens = lists[type];
         console.log(`\nrunning ${type} generator, got ${gens.length} configs`);
         for (const g of gens) {
             const start = new Date();
@@ -28,14 +53,28 @@ async function main() {
                     g.name,
                     g.config,
                 );
-                console.log(`\tgenerated ${posts.length} posts`);
-                await postsRepo.createMany(posts);
                 await generatorsRepo.finishRun(g.id, start, {
                     end: new Date(),
                     posts: posts.length,
                     outcome: "success",
                 });
+                await postsRepo.createMany(posts);
+                postsMade += posts.length;
+                success++;
+                await runsRepo.update(start, {
+                    lastUpdate: new Date(),
+                    successCount: success,
+                    postCount: postsMade,
+                });
+                console.log(`\tgenerated ${posts.length} posts`);
             } catch (e) {
+                fail++;
+                failed.push(g.id);
+                await runsRepo.update(start, {
+                    lastUpdate: new Date(),
+                    failCount: fail,
+                    failedIds: [...failed],
+                });
                 console.log(`\tfailed to run generator: ${e}`);
                 await generatorsRepo.finishRun(g.id, start, {
                     end: new Date(),
@@ -47,6 +86,8 @@ async function main() {
         }
         await generatorImpls[type].cleanup();
     }
+
+    await runsRepo.finish(start, new Date());
 }
 
 main()
