@@ -6,6 +6,7 @@ import {
 } from "../lib/repositories";
 import { TextPostGenerator } from "./textPostGenerator";
 import { ImagePostGenerator } from "./imgPostGenerator";
+import { RssTweetGenerator } from "./rssTweetGenerator";
 import { ImageGenClient } from "../lib/imageGenClient";
 import { FsImageRepo } from "../lib/repositories/impl/fsImageRepo";
 import { PostGenerator } from "./postGenerator";
@@ -17,6 +18,7 @@ const runsRepo = getWorkerRunRepository();
 const generatorImpls: Record<GeneratorType, PostGenerator> = {
     text: new TextPostGenerator(),
     picture: new ImagePostGenerator(new ImageGenClient(), new FsImageRepo()),
+    rss: new RssTweetGenerator(),
 };
 
 async function main() {
@@ -46,6 +48,7 @@ async function main() {
                     g.id,
                     g.name,
                     g.config,
+                    g.lastRun,
                 );
                 console.log(`\tgenerated ${posts.length} posts`);
                 await postsRepo.createMany(posts);

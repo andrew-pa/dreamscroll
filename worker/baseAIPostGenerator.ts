@@ -22,6 +22,7 @@ export abstract class BaseAIPostGenerator<
         id: number,
         name: string,
         rawConfig: unknown,
+        lastRun: Date | null,
     ): Promise<CreatePostRecord[]> {
         if (!this.validateConfig(rawConfig)) {
             throw new Error(
