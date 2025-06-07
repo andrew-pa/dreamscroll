@@ -28,7 +28,10 @@ export class DrizzleWorkerRunRepository implements IWorkerRunRepository {
         return rows as WorkerRunRecord[];
     }
 
-    async create(run: { startedAt: Date; numGenerators: number }): Promise<void> {
+    async create(run: {
+        startedAt: Date;
+        numGenerators: number;
+    }): Promise<void> {
         await db.insert(workerRuns).values({
             startedAt: run.startedAt,
             lastUpdate: run.startedAt,

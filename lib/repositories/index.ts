@@ -10,7 +10,10 @@ export type {
     GeneratorRunRecord,
     RunOutcome,
 } from "./generatorRepository";
-export type { IWorkerRunRepository, WorkerRunRecord } from "./workerRunRepository";
+export type {
+    IWorkerRunRepository,
+    WorkerRunRecord,
+} from "./workerRunRepository";
 
 import { DrizzlePostRepository } from "./impl/drizzlePostRepo";
 import { DrizzleGeneratorRepository } from "./impl/drizzleGeneratorRepo";

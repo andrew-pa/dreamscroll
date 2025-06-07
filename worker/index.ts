@@ -1,5 +1,4 @@
 import { GENERATOR_TYPES, GeneratorType } from "../lib/db/schema";
-import type { GeneratorRecord } from "../lib/repositories";
 import {
     getGeneratorRepository,
     getPostRepository,
@@ -21,19 +20,13 @@ const generatorImpls: Record<GeneratorType, PostGenerator> = {
 };
 
 async function main() {
-    const lists: Record<GeneratorType, GeneratorRecord[]> = {
-        text: [],
-        picture: [],
-    };
-    let total = 0;
-    for (const t of GENERATOR_TYPES) {
-        const gens = await generatorsRepo.list(t);
-        lists[t] = gens;
-        total += gens.length;
-    }
+    const generators = await generatorsRepo.list();
 
     const start = new Date();
-    await runsRepo.create({ startedAt: start, numGenerators: total });
+    await runsRepo.create({
+        startedAt: start,
+        numGenerators: generators.length,
+    });
 
     let success = 0;
     let fail = 0;
@@ -41,7 +34,7 @@ async function main() {
     const failed: number[] = [];
 
     for (const type of GENERATOR_TYPES) {
-        const gens = lists[type];
+        const gens = generators.filter(g => g.type === type);
         console.log(`\nrunning ${type} generator, got ${gens.length} configs`);
         for (const g of gens) {
             const start = new Date();

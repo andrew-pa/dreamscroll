@@ -53,7 +53,8 @@ export function isImageGeneratorConfig(x: unknown): x is ImageGeneratorConfig {
     return true;
 }
 
-const MODEL_NAME = process.env.IMG_GEN_MODEL ?? "stabilityai/stable-diffusion-3.5-medium";
+const MODEL_NAME =
+    process.env.IMG_GEN_MODEL ?? "stabilityai/stable-diffusion-3.5-medium";
 
 export class ImagePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig> {
     private client: ImageGenClient;

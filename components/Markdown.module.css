@@ -46,7 +46,9 @@
 
 .markdown pre,
 .markdown code {
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-family:
+        ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo,
+        monospace;
     white-space: pre-wrap;
     word-break: break-word;
 }
