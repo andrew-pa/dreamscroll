@@ -2,6 +2,7 @@ import { GENERATOR_TYPES, GeneratorType } from "../lib/db/schema";
 import { getGeneratorRepository, getPostRepository } from "../lib/repositories";
 import { TextPostGenerator } from "./textPostGenerator";
 import { ImagePostGenerator } from "./imgPostGenerator";
+import { FeedPostGenerator } from "./feedPostGenerator";
 import { ImageGenClient } from "../lib/imageGenClient";
 import { FsImageRepo } from "../lib/repositories/impl/fsImageRepo";
 import { PostGenerator } from "./postGenerator";
@@ -12,6 +13,7 @@ const postsRepo = getPostRepository();
 const generatorImpls: Record<GeneratorType, PostGenerator> = {
     text: new TextPostGenerator(),
     picture: new ImagePostGenerator(new ImageGenClient(), new FsImageRepo()),
+    feed: new FeedPostGenerator(),
 };
 
 async function main() {
