@@ -1,7 +1,16 @@
 import { db } from "@/lib/db";
-import { generators, GeneratorType } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { IGeneratorRepository, GeneratorRecord } from "../generatorRepository";
+import {
+    generators,
+    GeneratorType,
+    generatorRuns,
+    RunOutcome,
+} from "@/lib/db/schema";
+import { eq, desc, and } from "drizzle-orm";
+import {
+    IGeneratorRepository,
+    GeneratorRecord,
+    GeneratorRunRecord,
+} from "../generatorRepository";
 
 /** Concrete Drizzle implementation */
 export class DrizzleGeneratorRepository implements IGeneratorRepository {
@@ -29,7 +38,6 @@ export class DrizzleGeneratorRepository implements IGeneratorRepository {
                 name: input.name,
                 type: input.type,
                 config: input.config ?? {},
-                lastRun: null,
             })
             .returning(); // supported by SQLite ≥ 3.35 and Drizzle ≥ 0.30 :contentReference[oaicite:3]{index=3}
 
@@ -55,11 +63,49 @@ export class DrizzleGeneratorRepository implements IGeneratorRepository {
         return row;
     }
 
-    async recordRun(id: number, timestamp: Date): Promise<void> {
+    async createRun(generatorId: number, start: Date): Promise<void> {
+        await db.insert(generatorRuns).values({
+            generatorId,
+            startTs: start,
+        });
+    }
+
+    async finishRun(
+        generatorId: number,
+        start: Date,
+        result: {
+            end: Date;
+            posts: number;
+            outcome: RunOutcome;
+            error?: string;
+        },
+    ): Promise<void> {
         await db
-            .update(generators)
-            .set({ lastRun: timestamp })
-            .where(eq(generators.id, id));
+            .update(generatorRuns)
+            .set({
+                endTs: result.end,
+                posts: result.posts,
+                outcome: result.outcome,
+                error: result.error,
+            })
+            .where(
+                and(
+                    eq(generatorRuns.generatorId, generatorId),
+                    eq(generatorRuns.startTs, start),
+                ),
+            )
+            .run();
+    }
+
+    async getLastRun(id: number): Promise<GeneratorRunRecord | null> {
+        const r = await db
+            .select()
+            .from(generatorRuns)
+            .where(eq(generatorRuns.generatorId, id))
+            .orderBy(desc(generatorRuns.startTs))
+            .limit(1)
+            .all();
+        return (r[0] as GeneratorRunRecord | undefined) ?? null;
     }
 
     async delete(id: number): Promise<void> {

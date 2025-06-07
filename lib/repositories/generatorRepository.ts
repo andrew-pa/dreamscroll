@@ -1,13 +1,21 @@
-export type { GeneratorType } from "@/lib/db/schema";
+export type { GeneratorType, RunOutcome } from "@/lib/db/schema";
 export { GENERATOR_TYPES } from "@/lib/db/schema";
-import type { GeneratorType } from "@/lib/db/schema";
+import type { GeneratorType, RunOutcome } from "@/lib/db/schema";
 
 export interface GeneratorRecord {
     id: number;
     name: string;
     type: GeneratorType;
     config: unknown;
-    lastRun: Date | null;
+}
+
+export interface GeneratorRunRecord {
+    generatorId: number;
+    startTs: Date;
+    endTs?: Date | null;
+    posts?: number | null;
+    outcome?: RunOutcome | null;
+    error?: string | null;
 }
 
 export interface IGeneratorRepository {
@@ -24,7 +32,20 @@ export interface IGeneratorRepository {
         patch: { name?: string; config?: unknown },
     ): Promise<GeneratorRecord>;
 
-    recordRun(id: number, timestamp: Date): Promise<void>;
+    createRun(generatorId: number, start: Date): Promise<void>;
+
+    finishRun(
+        generatorId: number,
+        start: Date,
+        result: {
+            end: Date;
+            posts: number;
+            outcome: RunOutcome;
+            error?: string;
+        },
+    ): Promise<void>;
+
+    getLastRun(id: number): Promise<GeneratorRunRecord | null>;
 
     delete(id: number): Promise<void>;
 }

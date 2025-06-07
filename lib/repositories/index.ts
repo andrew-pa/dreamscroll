@@ -6,6 +6,8 @@ export type { IPostRepository } from "./postRepository";
 export type {
     IGeneratorRepository,
     GeneratorRecord,
+    GeneratorRunRecord,
+    RunOutcome,
 } from "./generatorRepository";
 
 import { DrizzlePostRepository } from "./impl/drizzlePostRepo";
