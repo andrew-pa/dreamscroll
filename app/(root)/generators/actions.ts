@@ -46,3 +46,15 @@ export async function deleteGenerator(id: number) {
     await repo.delete(id);
     revalidatePath("/generators");
 }
+
+export async function duplicateGenerator(id: number) {
+    const repo = getGeneratorRepository();
+    const gen = await repo.get(id);
+    if (!gen) throw new Error(`Generator ${id} not found`);
+    await repo.create({
+        name: `Copy of ${gen.name}`,
+        type: gen.type,
+        config: gen.config,
+    });
+    revalidatePath("/generators");
+}

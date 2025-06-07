@@ -21,6 +21,8 @@ export interface GeneratorRunRecord {
 export interface IGeneratorRepository {
     list(type?: GeneratorType): Promise<GeneratorRecord[]>;
 
+    get(id: number): Promise<GeneratorRecord | null>;
+
     create(input: {
         name: string;
         type: GeneratorType;
