@@ -35,7 +35,7 @@ export const posts = sqliteTable(
     ],
 );
 
-export const GENERATOR_TYPES = ["text", "picture", "rss"] as const;
+export const GENERATOR_TYPES = ["text", "picture", "feed"] as const;
 export type GeneratorType = (typeof GENERATOR_TYPES)[number];
 
 export const generators = sqliteTable("generators", {

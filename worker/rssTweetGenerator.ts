@@ -16,16 +16,16 @@ interface FeedItem {
     feed: string;
 }
 
-interface RssTweetGeneratorConfig {
+interface FeedPostGeneratorConfig {
     /** URL that lists new items. `since` (ISO timestamp) will be appended. */
     updatesUrl: string;
     /** Base URL used to build the more-link for each post */
     itemUrlBase: string;
 }
 
-export function isRssTweetGeneratorConfig(
+export function isFeedPostGeneratorConfig(
     x: unknown,
-): x is RssTweetGeneratorConfig {
+): x is FeedPostGeneratorConfig {
     if (typeof x !== "object" || x === null) return false;
     const obj = x as Record<string, unknown>;
     return (
@@ -36,11 +36,11 @@ export function isRssTweetGeneratorConfig(
 
 const MODEL_NAME = process.env.TEXT_GEN_MODEL ?? "gpt-3.5-turbo";
 const SYSTEM_MESSAGE =
-    "You turn articles into short tweet threads that make people want to read the full story.";
+    "You turn articles into short post threads that make people want to read the full story.";
 
 const turndown = new TurndownService();
 
-export class RssTweetGenerator extends PostGenerator {
+export class FeedPostGenerator extends PostGenerator {
     private client = new OpenAI();
 
     public async generatePosts(
@@ -49,10 +49,10 @@ export class RssTweetGenerator extends PostGenerator {
         rawConfig: unknown,
         lastRun: Date | null,
     ): Promise<CreatePostRecord[]> {
-        if (!isRssTweetGeneratorConfig(rawConfig)) {
+        if (!isFeedPostGeneratorConfig(rawConfig)) {
             throw new Error("invalid config for RssTweetGenerator");
         }
-        const config = rawConfig as RssTweetGeneratorConfig;
+        const config = rawConfig as FeedPostGeneratorConfig;
         const since = (lastRun ?? new Date(0)).toISOString();
         const url = new URL(config.updatesUrl);
         url.searchParams.set("since", since);
@@ -62,9 +62,9 @@ export class RssTweetGenerator extends PostGenerator {
         for (const item of items) {
             try {
                 const article = await this.fetchArticleMarkdown(item.url);
-                const tweets = await this.summarize(article);
+                const articlePosts = await this.summarize(article);
                 const baseTime = new Date(item.published).getTime();
-                tweets.forEach((t, idx) => {
+                articlePosts.forEach((t, idx) => {
                     posts.push({
                         generatorId: id,
                         generatorName: item.feed,
@@ -96,7 +96,7 @@ export class RssTweetGenerator extends PostGenerator {
         markdown: string,
     ): Promise<{ text: string; imageUrl?: string }[]> {
         const schema = z.object({
-            tweets: z
+            posts: z
                 .array(
                     z.object({
                         text: z.string(),
@@ -107,7 +107,7 @@ export class RssTweetGenerator extends PostGenerator {
                 .max(7),
         });
 
-        const completion = await this.client.beta.chat.completions.create({
+        const completion = await this.client.beta.chat.completions.parse({
             model: MODEL_NAME,
             messages: [
                 { role: "system", content: SYSTEM_MESSAGE },
@@ -116,12 +116,12 @@ export class RssTweetGenerator extends PostGenerator {
                     content: `Create engaging tweets from the article below.\n\n${markdown}`,
                 },
             ],
-            response_format: zodResponseFormat(schema, "tweets"),
+            response_format: zodResponseFormat(schema, "posts"),
         });
 
         const parsed = completion.choices[0].message.parsed ?? {
-            tweets: [],
+            posts: [],
         };
-        return parsed.tweets;
+        return parsed.posts;
     }
 }
