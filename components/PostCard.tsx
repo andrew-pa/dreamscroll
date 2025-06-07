@@ -14,6 +14,7 @@ import { useInView } from "react-intersection-observer";
 import { useState, useEffect, useRef } from "react";
 import { PostRecord, Reaction } from "@/lib/repositories/postRepository";
 import Markdown from "react-markdown";
+import styles from "./Markdown.module.css";
 
 interface Props {
     post: PostRecord;
@@ -79,9 +80,9 @@ export default function PostCard({ post }: Props) {
             )}
 
             {post.body && (
-                <Text mb={2} whiteSpace="pre-wrap" textWrap="pretty">
+                <Box mb={2} className={styles.markdown}>
                     <Markdown>{post.body}</Markdown>
-                </Text>
+                </Box>
             )}
 
             {post.moreLink && (

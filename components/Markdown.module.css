@@ -1,0 +1,84 @@
+.markdown {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+}
+
+.markdown p {
+    margin: 0.5em 0;
+}
+
+.markdown ul,
+.markdown ol {
+    padding-left: 1.25em;
+    margin: 0.5em 0;
+}
+
+.markdown li {
+    margin-bottom: 0.25em;
+}
+
+.markdown blockquote {
+    margin: 0.5em 0;
+    padding-left: 0.75em;
+    border-left: 4px solid #ccc;
+    color: #555;
+}
+
+@media (prefers-color-scheme: dark) {
+    .markdown blockquote {
+        border-left-color: #444;
+        color: #ccc;
+    }
+}
+
+.markdown pre,
+.markdown code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.markdown pre {
+    padding: 0.5em;
+    border-radius: 4px;
+    background: #f5f5f5;
+    overflow-x: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+    .markdown pre {
+        background: #1e1e1e;
+    }
+}
+
+.markdown table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5em 0;
+}
+
+.markdown th,
+.markdown td {
+    border: 1px solid #ccc;
+    padding: 0.25em 0.5em;
+}
+
+@media (prefers-color-scheme: dark) {
+    .markdown th,
+    .markdown td {
+        border-color: #444;
+    }
+}
