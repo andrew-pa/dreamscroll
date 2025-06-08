@@ -49,5 +49,12 @@ export interface IGeneratorRepository {
 
     getLastRun(id: number): Promise<GeneratorRunRecord | null>;
 
+    /**
+     * List any generator errors for the worker run that started at `start`.
+     */
+    listRunErrors(
+        start: Date,
+    ): Promise<{ id: number; name: string; error: string }[]>;
+
     delete(id: number): Promise<void>;
 }

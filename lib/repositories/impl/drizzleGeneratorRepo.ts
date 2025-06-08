@@ -118,6 +118,25 @@ export class DrizzleGeneratorRepository implements IGeneratorRepository {
         return (r[0] as GeneratorRunRecord | undefined) ?? null;
     }
 
+    async listRunErrors(start: Date) {
+        const rows = await db
+            .select({
+                id: generatorRuns.generatorId,
+                name: generators.name,
+                error: generatorRuns.error,
+            })
+            .from(generatorRuns)
+            .innerJoin(generators, eq(generatorRuns.generatorId, generators.id))
+            .where(
+                and(
+                    eq(generatorRuns.startTs, start),
+                    eq(generatorRuns.outcome, "error"),
+                ),
+            )
+            .all();
+        return rows as { id: number; name: string; error: string }[];
+    }
+
     async delete(id: number): Promise<void> {
         await db.delete(generators).where(eq(generators.id, id)).run();
     }
