@@ -9,12 +9,14 @@ export interface WorkerRunRecord {
     failedIds: number[];
 }
 
-export function workerRunRecordFromJson(obj: any): WorkerRunRecord {
+export function workerRunRecordFromJson(
+    obj: Record<string, unknown>,
+): WorkerRunRecord {
     return {
         ...obj,
-        startedAt: new Date(obj.startedAt),
-        endedAt: obj.endedAt ? new Date(obj.endedAt) : null,
-        lastUpdate: new Date(obj.lastUpdate),
+        startedAt: new Date(obj.startedAt as string),
+        endedAt: obj.endedAt ? new Date(obj.endedAt as string) : null,
+        lastUpdate: new Date(obj.lastUpdate as string),
     } as WorkerRunRecord;
 }
 

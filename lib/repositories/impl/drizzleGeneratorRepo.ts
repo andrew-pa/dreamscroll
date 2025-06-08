@@ -74,10 +74,13 @@ export class DrizzleGeneratorRepository implements IGeneratorRepository {
     }
 
     async createRun(generatorId: number, start: Date): Promise<void> {
-        await db.insert(generatorRuns).values({
-            generatorId,
-            startTs: start,
-        });
+        await db
+            .insert(generatorRuns)
+            .values({
+                generatorId,
+                startTs: start,
+            })
+            .run();
     }
 
     async finishRun(

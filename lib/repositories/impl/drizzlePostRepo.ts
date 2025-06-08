@@ -36,7 +36,7 @@ export class DrizzlePostRepository implements IPostRepository {
     }
 
     async createMany(newPosts: CreatePostRecord[]): Promise<void> {
-        await db.insert(posts).values(newPosts.map(postInsertValues));
+        await db.insert(posts).values(newPosts.map(postInsertValues)).run();
     }
 
     async markSeen(id: number, when: Date) {
@@ -46,7 +46,8 @@ export class DrizzlePostRepository implements IPostRepository {
                 seenCount: sql`seen_count + 1`,
                 lastSeenTs: when,
             })
-            .where(eq(posts.id, id));
+            .where(eq(posts.id, id))
+            .run();
     }
 
     async toggleReaction(id: number, reaction: Reaction | "none", when: Date) {
@@ -56,7 +57,8 @@ export class DrizzlePostRepository implements IPostRepository {
                 reaction,
                 reactionTs: reaction === "none" ? null : when,
             })
-            .where(eq(posts.id, id));
+            .where(eq(posts.id, id))
+            .run();
     }
 
     /** Feed selection (implements the scoring algo) ----------------------- */
