@@ -23,7 +23,7 @@ export function WorkerRunPopoverContent({
     const end = run.endedAt ?? new Date();
     const pending = run.numGenerators - run.successCount - run.failCount;
     return (
-        <Stack spacing={3} fontSize="sm">
+        <Stack gap={3} fontSize="sm">
             <Text>
                 <strong>Started:</strong> {run.startedAt.toLocaleString()}
             </Text>
@@ -43,8 +43,8 @@ export function WorkerRunPopoverContent({
             <Text>
                 <strong>Posts:</strong> {run.postCount}
             </Text>
-            <Link as={NextLink} href="/worker" color="teal.500">
-                Worker status page
+            <Link as={NextLink} href="/worker">
+                Status History
             </Link>
         </Stack>
     );

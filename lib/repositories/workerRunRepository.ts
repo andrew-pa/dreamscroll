@@ -9,6 +9,15 @@ export interface WorkerRunRecord {
     failedIds: number[];
 }
 
+export function workerRunRecordFromJson(obj: any): WorkerRunRecord {
+    return {
+        ...obj,
+        startedAt: new Date(obj.startedAt),
+        endedAt: obj.endedAt ? new Date(obj.endedAt) : null,
+        lastUpdate: new Date(obj.lastUpdate),
+    } as WorkerRunRecord;
+}
+
 export interface IWorkerRunRepository {
     /** Return the most recent run or null if none exist */
     getLast(): Promise<WorkerRunRecord | null>;

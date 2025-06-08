@@ -1,20 +1,21 @@
 "use client";
 import {
-    CircularProgress,
-    CircularProgressLabel,
+    ProgressCircle,
     IconButton,
     Popover,
-    PopoverBody,
-    PopoverContent,
-    PopoverTrigger,
+    AbsoluteCenter,
+    Portal,
 } from "@chakra-ui/react";
-import { useDisclosure } from "@chakra-ui/react";
 import { FiCheck, FiAlertCircle } from "react-icons/fi";
 import useSWR from "swr";
 import type { WorkerRunRecord } from "@/lib/repositories";
 import { WorkerRunPopoverContent } from "./WorkerRunPopoverContent";
+import { workerRunRecordFromJson } from "@/lib/repositories/workerRunRepository";
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+const fetcher = (url: string) =>
+    fetch(url)
+        .then(r => r.json())
+        .then(workerRunRecordFromJson);
 
 interface Props {
     display?: Record<string, string>;
@@ -26,33 +27,24 @@ export default function WorkerStatusIndicator({ display }: Props) {
         fetcher,
         { refreshInterval: 30000 },
     );
-    const { isOpen, onOpen, onClose } = useDisclosure();
     const run = data ?? null;
 
     let value = 0;
-    let color = "gray.400";
     let label: React.ReactNode = null;
 
     if (run) {
         if (run.endedAt) {
             value = 100;
-            color = run.failCount > 0 ? "red.500" : "green.500";
             label = run.failCount > 0 ? <FiAlertCircle /> : <FiCheck />;
         } else {
             value =
                 ((run.successCount + run.failCount) / run.numGenerators) * 100;
-            color = "blue.500";
         }
     }
 
     return (
-        <Popover
-            isOpen={isOpen}
-            onOpen={onOpen}
-            onClose={onClose}
-            placement="bottom-start"
-        >
-            <PopoverTrigger>
+        <Popover.Root positioning={{ placement: "bottom-start" }}>
+            <Popover.Trigger asChild>
                 <IconButton
                     aria-label="Worker status"
                     variant="ghost"
@@ -60,20 +52,25 @@ export default function WorkerStatusIndicator({ display }: Props) {
                     minW="40px"
                     display={display}
                 >
-                    <CircularProgress value={value} size="24px" color={color}>
-                        {label && (
-                            <CircularProgressLabel>
-                                {label}
-                            </CircularProgressLabel>
-                        )}
-                    </CircularProgress>
+                    <ProgressCircle.Root value={value} size="xs">
+                        <ProgressCircle.Circle css={{ "--thickness": "2px" }}>
+                            <ProgressCircle.Track />
+                            <ProgressCircle.Range />
+                        </ProgressCircle.Circle>
+                        {label && <AbsoluteCenter>{label}</AbsoluteCenter>}
+                    </ProgressCircle.Root>
                 </IconButton>
-            </PopoverTrigger>
-            <PopoverContent w="xs">
-                <PopoverBody>
-                    <WorkerRunPopoverContent run={run} />
-                </PopoverBody>
-            </PopoverContent>
-        </Popover>
+            </Popover.Trigger>
+            <Portal>
+                <Popover.Positioner>
+                    <Popover.Content w="xs">
+                        <Popover.Arrow />
+                        <Popover.Body>
+                            <WorkerRunPopoverContent run={run} />
+                        </Popover.Body>
+                    </Popover.Content>
+                </Popover.Positioner>
+            </Portal>
+        </Popover.Root>
     );
 }

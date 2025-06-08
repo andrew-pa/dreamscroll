@@ -48,6 +48,7 @@ export class DrizzleWorkerRunRepository implements IWorkerRunRepository {
         patch: Partial<Omit<WorkerRunRecord, "startedAt">>,
     ): Promise<void> {
         const changes: Partial<WorkerRunRecord> = { ...patch };
+        console.log("update", startedAt, changes);
         await db
             .update(workerRuns)
             .set(changes)
