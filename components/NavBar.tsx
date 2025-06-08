@@ -1,6 +1,7 @@
 import { Box, Flex, Grid, IconButton, Link, Heading } from "@chakra-ui/react";
 import { FiBookmark, FiSettings } from "react-icons/fi";
 import NextLink from "next/link";
+import WorkerStatusIndicator from "./WorkerStatusIndicator";
 
 export function NavBar() {
     return (
@@ -17,7 +18,7 @@ export function NavBar() {
             borderBottom="1px solid var(--chakra-colors-border)"
             zIndex="banner"
         >
-            {/* 1 ▸ LEFT slot — bookmark icon on mobile, invisible placeholder on desktop */}
+            {/* 1 ▸ LEFT slot — bookmark + status on mobile, placeholder on desktop */}
             <LeftPad />
 
             {/* 2 ▸ CENTRE — cursive, lowercase title */}
@@ -34,13 +35,17 @@ export function NavBar() {
                 </Link>
             </Heading>
 
-            {/* 3 ▸ RIGHT slot — settings icon (always) + bookmark on desktop */}
+            {/* 3 ▸ RIGHT slot — settings icon (always) + bookmark and status on desktop */}
             <Flex justify="flex-end" gap="2">
                 {/* show the bookmark here only ≥ md */}
                 <NavIcon
                     href="/saved"
                     label="Saved posts"
                     icon={<FiBookmark />}
+                    display={{ base: "none", md: "inline-flex" }}
+                />
+                {/* show worker status here only ≥ md */}
+                <WorkerStatusIndicator
                     display={{ base: "none", md: "inline-flex" }}
                 />
                 <NavIcon
@@ -63,6 +68,9 @@ function LeftPad() {
                 href="/saved"
                 label="Saved posts"
                 icon={<FiBookmark />}
+                display={{ base: "inline-flex", md: "none" }}
+            />
+            <WorkerStatusIndicator
                 display={{ base: "inline-flex", md: "none" }}
             />
             <Box w="40px" display={{ base: "none", md: "block" }} />
