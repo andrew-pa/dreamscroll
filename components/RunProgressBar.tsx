@@ -1,4 +1,4 @@
-import { AbsoluteCenter, Box, Center, HStack } from "@chakra-ui/react";
+import { Box, Center, HStack } from "@chakra-ui/react";
 interface Props {
     successCount: number;
     failCount: number;
@@ -23,14 +23,14 @@ export function RunProgressBar({ successCount, failCount, total }: Props) {
                     <Center>{failCount}</Center>
                 </Box>
             )}
-            <Box
+            {pendingPct > 0 &&<Box
                 bg="gray.300"
                 _dark={{ bg: "gray.600" }}
                 w={`${pendingPct}%`}
                 h="full"
             >
                 <Center>{total - successCount - failCount}</Center>
-            </Box>
+            </Box>}
         </HStack>
     );
 }

@@ -23,10 +23,11 @@ async function main() {
     const generators = await generatorsRepo.list();
 
     const start = new Date();
-    await runsRepo.create({
+    const runId = await runsRepo.create({
         startedAt: start,
         numGenerators: generators.length,
     });
+    console.log(`run id ${runId} started at ${start}`);
 
     let success = 0;
     let fail = 0;
@@ -66,7 +67,7 @@ async function main() {
                     error: e instanceof Error ? e.message : String(e),
                 });
             }
-            await runsRepo.update(start, {
+            await runsRepo.update(runId, {
                 lastUpdate: new Date(),
                 successCount: success,
                 failCount: fail,
@@ -79,7 +80,7 @@ async function main() {
 
     console.log(`${success} generators succeeded, ${fail} failed: ${failed}`);
 
-    await runsRepo.finish(start, new Date());
+    await runsRepo.finish(runId, new Date());
 }
 
 main()

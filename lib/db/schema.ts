@@ -4,7 +4,6 @@ import {
     text,
     integer,
     index,
-    primaryKey,
 } from "drizzle-orm/sqlite-core";
 
 export type Reaction = "dislike" | "like" | "heart" | "none";
@@ -59,6 +58,7 @@ export type RunOutcome = (typeof RUN_OUTCOMES)[number];
 export const generatorRuns = sqliteTable(
     "generator_runs",
     {
+        id: integer("id").primaryKey({autoIncrement: true}),
         generatorId: integer("generator_id")
             .notNull()
             .references(() => generators.id),
@@ -72,11 +72,11 @@ export const generatorRuns = sqliteTable(
         }).$type<RunOutcome | null>(),
         error: text("error"),
     },
-    t => [primaryKey(t.generatorId, t.startTs)],
 );
 
 export const workerRuns = sqliteTable("worker_runs", {
-    startedAt: integer("started_at", { mode: "timestamp_ms" }).primaryKey(),
+    id: integer("id").primaryKey({autoIncrement: true}),
+    startedAt: integer("started_at", { mode: "timestamp_ms" }),
     endedAt: integer("ended_at", { mode: "timestamp_ms" })
         .$type<Date | null>()
         .default(null),

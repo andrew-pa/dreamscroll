@@ -31,8 +31,8 @@ export class DrizzleWorkerRunRepository implements IWorkerRunRepository {
     async create(run: {
         startedAt: Date;
         numGenerators: number;
-    }): Promise<void> {
-        await db.insert(workerRuns).values({
+    }): Promise<number> {
+        const res = await db.insert(workerRuns).values({
             startedAt: run.startedAt,
             lastUpdate: run.startedAt,
             numGenerators: run.numGenerators,
@@ -40,25 +40,32 @@ export class DrizzleWorkerRunRepository implements IWorkerRunRepository {
             failCount: 0,
             postCount: 0,
             failedIds: [],
-        });
+        }).returning({id: workerRuns.id});
+        return res[0].id;
     }
 
     async update(
-        startedAt: Date,
+        id: number,
         patch: Partial<Omit<WorkerRunRecord, "startedAt">>,
     ): Promise<void> {
         const changes: Partial<WorkerRunRecord> = { ...patch };
-        console.log("update", startedAt, changes);
+        console.log("update", id, changes);
         await db
             .update(workerRuns)
             .set(changes)
-            .where(eq(workerRuns.startedAt, startedAt));
+            .where(eq(workerRuns.id, id))
+            .execute();
+        const readback = await db.select()
+            .from(workerRuns)
+            .where(eq(workerRuns.id, id))
+            .all();
+        console.log('readback', readback);
     }
 
-    async finish(startedAt: Date, endedAt: Date): Promise<void> {
+    async finish(id: number, endedAt: Date): Promise<void> {
         await db
             .update(workerRuns)
             .set({ endedAt, lastUpdate: endedAt })
-            .where(eq(workerRuns.startedAt, startedAt));
+            .where(eq(workerRuns.id, id));
     }
 }

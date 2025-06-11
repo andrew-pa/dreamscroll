@@ -9,12 +9,26 @@ export interface WorkerRunRecord {
     failedIds: number[];
 }
 
-export function workerRunRecordFromJson(obj: any): WorkerRunRecord {
+export function workerRunRecordFromJson(obj: {
+    startedAt: string;
+    endedAt: string | null;
+    lastUpdate: string;
+    numGenerators: number;
+    successCount: number;
+    failCount: number;
+    postCount: number;
+    failedIds: number[];
+}): WorkerRunRecord {
     return {
         ...obj,
-        startedAt: new Date(obj.startedAt),
-        endedAt: obj.endedAt ? new Date(obj.endedAt) : null,
-        lastUpdate: new Date(obj.lastUpdate),
+       numGenerators: obj.numGenerators,
+       successCount: obj.successCount,
+       failCount: obj.failCount,
+       postCount: obj.postCount,
+       failedIds: obj.failedIds,
+       startedAt: new Date(obj.startedAt),
+       endedAt: obj.endedAt ? new Date(obj.endedAt) : null,
+       lastUpdate: new Date(obj.lastUpdate),
     } as WorkerRunRecord;
 }
 
@@ -26,14 +40,14 @@ export interface IWorkerRunRepository {
     list(limit: number, offset: number): Promise<WorkerRunRecord[]>;
 
     /** Start tracking a new run */
-    create(run: { startedAt: Date; numGenerators: number }): Promise<void>;
+    create(run: { startedAt: Date; numGenerators: number }): Promise<number>;
 
     /** Update an existing run */
     update(
-        startedAt: Date,
+        id: number,
         patch: Partial<Omit<WorkerRunRecord, "startedAt">>,
     ): Promise<void>;
 
     /** Mark a run as finished */
-    finish(startedAt: Date, endedAt: Date): Promise<void>;
+    finish(id: number, endedAt: Date): Promise<void>;
 }
