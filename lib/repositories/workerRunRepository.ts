@@ -21,14 +21,14 @@ export function workerRunRecordFromJson(obj: {
 }): WorkerRunRecord {
     return {
         ...obj,
-       numGenerators: obj.numGenerators,
-       successCount: obj.successCount,
-       failCount: obj.failCount,
-       postCount: obj.postCount,
-       failedIds: obj.failedIds,
-       startedAt: new Date(obj.startedAt),
-       endedAt: obj.endedAt ? new Date(obj.endedAt) : null,
-       lastUpdate: new Date(obj.lastUpdate),
+        numGenerators: obj.numGenerators,
+        successCount: obj.successCount,
+        failCount: obj.failCount,
+        postCount: obj.postCount,
+        failedIds: obj.failedIds,
+        startedAt: new Date(obj.startedAt),
+        endedAt: obj.endedAt ? new Date(obj.endedAt) : null,
+        lastUpdate: new Date(obj.lastUpdate),
     } as WorkerRunRecord;
 }
 

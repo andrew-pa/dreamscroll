@@ -23,14 +23,16 @@ export function RunProgressBar({ successCount, failCount, total }: Props) {
                     <Center>{failCount}</Center>
                 </Box>
             )}
-            {pendingPct > 0 &&<Box
-                bg="gray.300"
-                _dark={{ bg: "gray.600" }}
-                w={`${pendingPct}%`}
-                h="full"
-            >
-                <Center>{total - successCount - failCount}</Center>
-            </Box>}
+            {pendingPct > 0 && (
+                <Box
+                    bg="gray.300"
+                    _dark={{ bg: "gray.600" }}
+                    w={`${pendingPct}%`}
+                    h="full"
+                >
+                    <Center>{total - successCount - failCount}</Center>
+                </Box>
+            )}
         </HStack>
     );
 }

@@ -32,15 +32,18 @@ export class DrizzleWorkerRunRepository implements IWorkerRunRepository {
         startedAt: Date;
         numGenerators: number;
     }): Promise<number> {
-        const res = await db.insert(workerRuns).values({
-            startedAt: run.startedAt,
-            lastUpdate: run.startedAt,
-            numGenerators: run.numGenerators,
-            successCount: 0,
-            failCount: 0,
-            postCount: 0,
-            failedIds: [],
-        }).returning({id: workerRuns.id});
+        const res = await db
+            .insert(workerRuns)
+            .values({
+                startedAt: run.startedAt,
+                lastUpdate: run.startedAt,
+                numGenerators: run.numGenerators,
+                successCount: 0,
+                failCount: 0,
+                postCount: 0,
+                failedIds: [],
+            })
+            .returning({ id: workerRuns.id });
         return res[0].id;
     }
 
@@ -55,11 +58,6 @@ export class DrizzleWorkerRunRepository implements IWorkerRunRepository {
             .set(changes)
             .where(eq(workerRuns.id, id))
             .execute();
-        const readback = await db.select()
-            .from(workerRuns)
-            .where(eq(workerRuns.id, id))
-            .all();
-        console.log('readback', readback);
     }
 
     async finish(id: number, endedAt: Date): Promise<void> {

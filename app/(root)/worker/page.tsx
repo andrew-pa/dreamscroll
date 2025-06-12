@@ -69,12 +69,12 @@ export default function WorkerRunsPage() {
     const errors = data?.errors ?? {};
 
     const formatDuration = (run: WorkerRunRecord) => {
-        const end = run.endedAt ? new Date(run.endedAt) : new Date();
-        const start = new Date(run.startedAt);
+        const end = run.endedAt ? run.endedAt : run.lastUpdate;
+        const start = run.startedAt;
         const ms = end.getTime() - start.getTime();
         const m = Math.floor(ms / 60000);
         const s = Math.floor((ms % 60000) / 1000);
-        return `${m}m ${s}s`;
+        return `${m}m ${s}s ${run.endedAt ? "." : "*"}`;
     };
 
     return (
@@ -84,7 +84,7 @@ export default function WorkerRunsPage() {
                 <Table.Header>
                     <Table.Row>
                         <Table.ColumnHeader>Started</Table.ColumnHeader>
-                        <Table.ColumnHeader>Ended</Table.ColumnHeader>
+                        <Table.ColumnHeader>Last Update</Table.ColumnHeader>
                         <Table.ColumnHeader>Duration</Table.ColumnHeader>
                         <Table.ColumnHeader># Generators</Table.ColumnHeader>
                         <Table.ColumnHeader w="40%">
@@ -104,9 +104,7 @@ export default function WorkerRunsPage() {
                                         {run.startedAt.toLocaleString()}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {run.endedAt
-                                            ? run.endedAt.toLocaleString()
-                                            : ""}
+                                        {run.lastUpdate.toLocaleString()}
                                     </Table.Cell>
                                     <Table.Cell>
                                         {formatDuration(run)}

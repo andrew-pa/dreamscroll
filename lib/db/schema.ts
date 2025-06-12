@@ -1,10 +1,5 @@
 import { asc, desc } from "drizzle-orm";
-import {
-    sqliteTable,
-    text,
-    integer,
-    index,
-} from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 
 export type Reaction = "dislike" | "like" | "heart" | "none";
 
@@ -55,27 +50,22 @@ export const generators = sqliteTable("generators", {
 export const RUN_OUTCOMES = ["success", "error"] as const;
 export type RunOutcome = (typeof RUN_OUTCOMES)[number];
 
-export const generatorRuns = sqliteTable(
-    "generator_runs",
-    {
-        id: integer("id").primaryKey({autoIncrement: true}),
-        generatorId: integer("generator_id")
-            .notNull()
-            .references(() => generators.id),
-        startTs: integer("start_ts", { mode: "timestamp" })
-            .$type<Date>()
-            .notNull(),
-        endTs: integer("end_ts", { mode: "timestamp" }).$type<Date | null>(),
-        posts: integer("posts"),
-        outcome: text("outcome", {
-            enum: RUN_OUTCOMES,
-        }).$type<RunOutcome | null>(),
-        error: text("error"),
-    },
-);
+export const generatorRuns = sqliteTable("generator_runs", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    generatorId: integer("generator_id")
+        .notNull()
+        .references(() => generators.id),
+    startTs: integer("start_ts", { mode: "timestamp" }).$type<Date>().notNull(),
+    endTs: integer("end_ts", { mode: "timestamp" }).$type<Date | null>(),
+    posts: integer("posts"),
+    outcome: text("outcome", {
+        enum: RUN_OUTCOMES,
+    }).$type<RunOutcome | null>(),
+    error: text("error"),
+});
 
 export const workerRuns = sqliteTable("worker_runs", {
-    id: integer("id").primaryKey({autoIncrement: true}),
+    id: integer("id").primaryKey({ autoIncrement: true }),
     startedAt: integer("started_at", { mode: "timestamp_ms" }),
     endedAt: integer("ended_at", { mode: "timestamp_ms" })
         .$type<Date | null>()
