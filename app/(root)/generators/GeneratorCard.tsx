@@ -11,6 +11,8 @@ import {
     Text,
     Textarea,
     HStack,
+    Stack,
+    Box,
     useDisclosure,
 } from "@chakra-ui/react";
 import { FiTrash, FiCopy, FiChevronDown, FiChevronUp } from "react-icons/fi";
@@ -158,19 +160,27 @@ export default function GeneratorCard({ g }: { g: GeneratorWithRun }) {
             </CardHeader>
 
             <Card.Body display="flex" flexDirection="column" gap={4}>
-                <Text>
-                    <strong>Type:</strong> {g.type}
-                </Text>
+                <Stack
+                    direction={{ base: "column", md: "row" }}
+                    spacing={4}
+                    align="flex-start"
+                >
+                    <Box>
+                        <Text>
+                            <strong>Type:</strong> {g.type}
+                        </Text>
 
-                <RunInfo run={g.lastRun} />
+                        <RunInfo run={g.lastRun} />
+                    </Box>
 
-                <Field.Root required>
-                    <Field.Label>Name</Field.Label>
-                    <Input
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                    />
-                </Field.Root>
+                    <Field.Root required flex="1">
+                        <Field.Label>Name</Field.Label>
+                        <Input
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                        />
+                    </Field.Root>
+                </Stack>
 
                 <Field.Root invalid={!parsedOk}>
                     <HStack justify="space-between" align="center">
