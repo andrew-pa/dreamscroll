@@ -47,7 +47,6 @@ export function NavBar() {
             bg="var(--chakra-colors-bg)" /* adapts to color‑mode via CSS var */
             borderBottom="1px solid var(--chakra-colors-border)"
             zIndex="banner"
-            pos="relative"
         >
             {/* LEFT - saved posts */}
             <Flex flex="1" gap="2">
