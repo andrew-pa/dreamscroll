@@ -6,7 +6,7 @@ import {
 } from "../lib/repositories";
 import { TextPostGenerator } from "./textPostGenerator";
 import { ImagePostGenerator } from "./imgPostGenerator";
-import { FeedPostGenerator } from "./rssTweetGenerator";
+import { FeedPostGenerator } from "./feedPostGenerator";
 import { ImageGenClient } from "../lib/imageGenClient";
 import { FsImageRepo } from "../lib/repositories/impl/fsImageRepo";
 import { PostGenerator } from "./postGenerator";
