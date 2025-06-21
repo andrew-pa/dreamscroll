@@ -5,6 +5,7 @@ export abstract class PostGenerator {
         id: number,
         name: string,
         config: unknown,
+        lastRun: Date | null,
     ): Promise<CreatePostRecord[]>;
 
     public async cleanup(): Promise<void> {}

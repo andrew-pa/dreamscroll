@@ -22,6 +22,7 @@ export abstract class BaseAIPostGenerator<
         id: number,
         name: string,
         rawConfig: unknown,
+        lastRun: Date | null,
     ): Promise<CreatePostRecord[]> {
         if (!this.validateConfig(rawConfig)) {
             throw new Error(
@@ -30,6 +31,10 @@ export abstract class BaseAIPostGenerator<
         }
 
         const config = rawConfig as TConfig;
+
+        if(config.numPosts == 0) {
+            return [];
+        }
 
         const prompts = await new Prompt(config.prompt).sample(config.numPosts);
 

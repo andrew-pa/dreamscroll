@@ -70,6 +70,7 @@ export class ImagePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig
         id: number,
         name: string,
         rawConfig: unknown,
+        lastRun: Date | null,
     ): Promise<CreatePostRecord[]> {
         console.log("checking for image generator health");
         for (let i = 0; i < 20; ++i) {
@@ -82,7 +83,7 @@ export class ImagePostGenerator extends BaseAIPostGenerator<ImageGeneratorConfig
             }
             console.log("got health check result", health);
             if (health.status === "ok") {
-                return super.generatePosts(id, name, rawConfig);
+                return super.generatePosts(id, name, rawConfig, lastRun);
             }
         }
         throw new Error(

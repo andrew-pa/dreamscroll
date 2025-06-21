@@ -6,6 +6,7 @@ import {
 } from "../lib/repositories";
 import { TextPostGenerator } from "./textPostGenerator";
 import { ImagePostGenerator } from "./imgPostGenerator";
+import { FeedPostGenerator } from "./feedPostGenerator";
 import { ImageGenClient } from "../lib/imageGenClient";
 import { FsImageRepo } from "../lib/repositories/impl/fsImageRepo";
 import { PostGenerator } from "./postGenerator";
@@ -17,6 +18,7 @@ const runsRepo = getWorkerRunRepository();
 const generatorImpls: Record<GeneratorType, PostGenerator> = {
     text: new TextPostGenerator(),
     picture: new ImagePostGenerator(new ImageGenClient(), new FsImageRepo()),
+    feed: new FeedPostGenerator(),
 };
 
 async function main() {
@@ -38,17 +40,23 @@ async function main() {
         const gens = generators.filter(g => g.type === type);
         console.log(`\nrunning ${type} generator, got ${gens.length} configs`);
         for (const g of gens) {
+            const lastRun = await generatorsRepo.getLastRun(g.id);
             const start = new Date();
-            console.log(`running generator #${g.id} (${g.name}) @ ${start}`);
+            console.log(
+                `running generator #${g.id} (${g.name}) @ ${start} (last run @ ${lastRun?.startTs ?? "never"}, ${lastRun?.outcome ?? ""})`,
+            );
             await generatorsRepo.createRun(g.id, start);
             try {
                 const posts = await generatorImpls[type].generatePosts(
                     g.id,
                     g.name,
                     g.config,
+                    lastRun?.startTs ?? null,
                 );
                 console.log(`\tgenerated ${posts.length} posts`);
-                await postsRepo.createMany(posts);
+                if(posts.length > 0) {
+                    await postsRepo.createMany(posts);
+                }
                 postsMade += posts.length;
                 success++;
                 await generatorsRepo.finishRun(g.id, start, {
