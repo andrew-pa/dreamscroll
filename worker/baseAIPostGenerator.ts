@@ -32,6 +32,10 @@ export abstract class BaseAIPostGenerator<
 
         const config = rawConfig as TConfig;
 
+        if(config.numPosts == 0) {
+            return [];
+        }
+
         const prompts = await new Prompt(config.prompt).sample(config.numPosts);
 
         const posts = [];
