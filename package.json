@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "build:worker": "npx esbuild worker/index.ts --bundle --format=cjs --platform=node --target=node20 --external:wordpos --external:underscore --external:zod --outfile=build/worker.js",
+        "build:worker": "npx esbuild worker/index.ts --bundle --format=cjs --platform=node --target=node20 --external:wordpos --external:underscore --external:zod --external:jsdom --outfile=build/worker.js",
         "start": "next start",
         "lint": "next lint",
         "fmt": "npx prettier --write ."
