@@ -1,50 +1,81 @@
-import { Box, Flex, Grid, IconButton, Link, Heading } from "@chakra-ui/react";
-import { FiBookmark, FiSettings } from "react-icons/fi";
+"use client";
+import {
+    Flex,
+    IconButton,
+    Link,
+    Heading,
+    Drawer,
+    VStack,
+    useDisclosure,
+} from "@chakra-ui/react";
+import {
+    FiBookmark,
+    FiSettings,
+    FiMenu,
+} from "react-icons/fi";
 import NextLink from "next/link";
+import useSWR from "swr";
 import WorkerStatusIndicator from "./WorkerStatusIndicator";
+import { WorkerRunPopoverContent } from "./WorkerRunPopoverContent";
+import { workerRunRecordFromJson } from "@/lib/repositories/workerRunRepository";
+import type { WorkerRunRecord } from "@/lib/repositories";
+
+function WorkerStatusPanel() {
+    const { data } = useSWR<WorkerRunRecord | null>(
+        "/api/worker-runs/latest",
+        url =>
+            fetch(url)
+                .then(r => r.json())
+                .then(workerRunRecordFromJson),
+        { refreshInterval: 30000 },
+    );
+    return <WorkerRunPopoverContent run={data ?? null} />;
+}
 
 export function NavBar() {
+    const { open, onOpen, onClose } = useDisclosure();
+
     return (
-        <Grid
+        <Flex
             as="header"
             position="sticky"
             top="0"
             insetX="0"
             h={{ base: "56px", md: "64px" }}
             px={{ base: 3, md: 6 }}
-            templateColumns="auto 1fr auto"
-            alignItems="center"
+            align="center"
             bg="var(--chakra-colors-bg)" /* adapts to color‑mode via CSS var */
             borderBottom="1px solid var(--chakra-colors-border)"
             zIndex="banner"
+            pos="relative"
         >
-            {/* 1 ▸ LEFT slot — bookmark + status on mobile, placeholder on desktop */}
-            <LeftPad />
+            {/* LEFT - saved posts */}
+            <Flex flex="1" gap="2">
+                <NavIcon
+                    href="/saved"
+                    label="Saved posts"
+                    icon={<FiBookmark />}
+                />
+            </Flex>
 
-            {/* 2 ▸ CENTRE — cursive, lowercase title */}
+            {/* Center title */}
             <Heading
                 as="h1"
                 fontFamily="'Pacifico', cursive"
                 fontSize={{ base: "lg", md: "xl" }}
                 textTransform="lowercase"
-                textAlign="center"
                 lineHeight="1"
+                position="absolute"
+                left="50%"
+                transform="translateX(-50%)"
             >
                 <Link as={NextLink} href="/" color="inherit" textDecor="none">
                     dreamscroll
                 </Link>
             </Heading>
 
-            {/* 3 ▸ RIGHT slot — settings icon (always) + bookmark and status on desktop */}
-            <Flex justify="flex-end" gap="2">
-                {/* show the bookmark here only ≥ md */}
-                <NavIcon
-                    href="/saved"
-                    label="Saved posts"
-                    icon={<FiBookmark />}
-                    display={{ base: "none", md: "inline-flex" }}
-                />
-                {/* show worker status here only ≥ md */}
+            {/* RIGHT - icons or drawer */}
+            <Flex flex="1" justify="flex-end" gap="2">
                 <WorkerStatusIndicator
                     display={{ base: "none", md: "inline-flex" }}
                 />
@@ -52,29 +83,51 @@ export function NavBar() {
                     href="/generators"
                     label="Generators"
                     icon={<FiSettings />}
+                    display={{ base: "none", md: "inline-flex" }}
                 />
+                {/* Drawer toggle on mobile */}
+                <IconButton
+                    aria-label="Menu"
+                    variant="ghost"
+                    size="md"
+                    minW="40px"
+                    onClick={onOpen}
+                    display={{ base: "inline-flex", md: "none" }}
+                >
+                    <FiMenu />
+                </IconButton>
             </Flex>
-        </Grid>
-    );
-}
 
-/* ---------- left area helper ---------- */
-/* On mobile we show the bookmark; on desktop we render an empty 40 px box
-   so the centre title stays perfectly centred without JS measuring. */
-function LeftPad() {
-    return (
-        <>
-            <NavIcon
-                href="/saved"
-                label="Saved posts"
-                icon={<FiBookmark />}
-                display={{ base: "inline-flex", md: "none" }}
-            />
-            <WorkerStatusIndicator
-                display={{ base: "inline-flex", md: "none" }}
-            />
-            <Box w="40px" display={{ base: "none", md: "block" }} />
-        </>
+            <Drawer.Root open={open} onOpenChange={e => (e.open ? onOpen() : onClose())}>
+                <Drawer.Backdrop />
+                <Drawer.Positioner>
+                    <Drawer.Content maxW="xs">
+                        <Drawer.CloseTrigger />
+                        <Drawer.Body p={4}>
+                            <VStack align="stretch" gap={4}>
+                                <Link
+                                    as={NextLink}
+                                    href="/generators"
+                                    onClick={onClose}
+                                    fontSize="lg"
+                                >
+                                    Generators
+                                </Link>
+                                <Link
+                                    as={NextLink}
+                                    href="/worker"
+                                    onClick={onClose}
+                                    fontSize="lg"
+                                >
+                                    Workers
+                                </Link>
+                                <WorkerStatusPanel />
+                            </VStack>
+                        </Drawer.Body>
+                    </Drawer.Content>
+                </Drawer.Positioner>
+            </Drawer.Root>
+        </Flex>
     );
 }
 
