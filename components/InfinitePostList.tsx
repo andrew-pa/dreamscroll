@@ -28,7 +28,7 @@ export default function InfinitePostList({
     }, [inView, hasMore, isLoading, loadMore]);
 
     return (
-        <Box maxW={{ base: "full", md: "3xl" }} mx="auto">
+        <Box maxW={{ base: "full", md: "2xl" }} mx="auto">
             <VStack align="stretch" px={{ base: 2, md: 4 }} py={4}>
                 {posts.map(p => (
                     <PostCard key={p.id} post={p} />
