@@ -160,17 +160,15 @@ export default function GeneratorCard({ g }: { g: GeneratorWithRun }) {
             </CardHeader>
 
             <Card.Body display="flex" flexDirection="column" gap={4}>
-                <Stack
-                    direction={{ base: "column", md: "row" }}
-                    spacing={4}
-                    align="flex-start"
-                >
+                <Stack>
                     <Box>
                         <Text>
                             <strong>Type:</strong> {g.type}
                         </Text>
 
-                        <RunInfo run={g.lastRun} />
+                        <Stack direction={{ base: "column", md: "row" }} gapX={4} align="flex-start">
+                            <RunInfo run={g.lastRun} />
+                        </Stack>
                     </Box>
 
                     <Field.Root required flex="1">
