@@ -28,22 +28,24 @@ export default function InfinitePostList({
     }, [inView, hasMore, isLoading, loadMore]);
 
     return (
-        <VStack align="stretch" px={{ base: 2, md: 4 }} py={4}>
-            {posts.map(p => (
-                <PostCard key={p.id} post={p} />
-            ))}
+        <Box maxW={{ base: "full", md: "2xl" }} mx="auto">
+            <VStack align="stretch" px={{ base: 2, md: 4 }} py={4}>
+                {posts.map(p => (
+                    <PostCard key={p.id} post={p} />
+                ))}
 
-            <Center ref={ref} py={4}>
-                {isLoading && <Spinner size="sm" />}
-                {!hasMore && posts.length > 0 && !isLoading && (
-                    <Box fontSize="sm" color="fg.muted">
-                        ~ and that&apos;s the end! ~
-                    </Box>
-                )}
-                {posts.length === 0 && !isLoading && (
-                    <Box color="fg.muted">~ No posts ~</Box>
-                )}
-            </Center>
-        </VStack>
+                <Center ref={ref} py={4}>
+                    {isLoading && <Spinner size="sm" />}
+                    {!hasMore && posts.length > 0 && !isLoading && (
+                        <Box fontSize="sm" color="fg.muted">
+                            ~ and that&apos;s the end! ~
+                        </Box>
+                    )}
+                    {posts.length === 0 && !isLoading && (
+                        <Box color="fg.muted">~ No posts ~</Box>
+                    )}
+                </Center>
+            </VStack>
+        </Box>
     );
 }
