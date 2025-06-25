@@ -73,7 +73,7 @@ export default function PostCard({ post }: Props) {
                 <AspectRatio w="full" ratio={1} mb={2}>
                     <Image
                         src={post.imageUrl}
-                        alt="generated visual"
+                        alt=""
                         w="full"
                         rounded="md"
                         loading="lazy"

@@ -29,8 +29,7 @@ export function isFeedPostGeneratorConfig(
     if (typeof x !== "object" || x === null) return false;
     const obj = x as Record<string, unknown>;
     return (
-        typeof obj.sourceUrl === "string" &&
-        typeof obj.itemUrlBase === "string"
+        typeof obj.sourceUrl === "string" && typeof obj.itemUrlBase === "string"
     );
 }
 
@@ -61,7 +60,9 @@ export class FeedPostGenerator extends PostGenerator {
 
         const config = rawConfig as FeedPostGeneratorConfig;
 
-        const since = (lastRun ?? new Date(Date.now() - 3 * 24 * 3600 * 1000)).toISOString();
+        const since = (
+            lastRun ?? new Date(Date.now() - 3 * 24 * 3600 * 1000)
+        ).toISOString();
         const url = new URL(config.sourceUrl);
         url.searchParams.set("after", since);
         const items = (await got(url).json()) as FeedItem[];
@@ -70,7 +71,7 @@ export class FeedPostGenerator extends PostGenerator {
         for (const item of items) {
             try {
                 const article = await this.fetchArticleMarkdown(item.url);
-                if(article.indexOf("paid subscribers") >= 0) {
+                if (article.indexOf("paid subscribers") >= 0) {
                     continue;
                 }
                 const articlePosts = await this.summarize(article);
@@ -78,9 +79,13 @@ export class FeedPostGenerator extends PostGenerator {
                 articlePosts.forEach((t, idx) => {
                     posts.push({
                         generatorId: id,
-                        generatorName: item.feedName.length > 0 ? item.feedName : name,
+                        generatorName:
+                            item.feedName.length > 0 ? item.feedName : name,
                         timestamp: new Date(baseTime + idx * 6_000),
-                        imageUrl: t.imageUrl?.length == 0 || t.imageUrl == "null" ? null : t.imageUrl,
+                        imageUrl:
+                            t.imageUrl?.length == 0 || t.imageUrl == "null"
+                                ? null
+                                : t.imageUrl,
                         body: t.text,
                         moreLink: new URL(
                             item.id,
@@ -107,13 +112,12 @@ export class FeedPostGenerator extends PostGenerator {
         markdown: string,
     ): Promise<{ text: string; imageUrl?: string | null }[]> {
         const schema = z.object({
-            posts: z
-                .array(
-                    z.object({
-                        text: z.string(),
-                        imageUrl: z.string().nullable(),
-                    }),
-                )
+            posts: z.array(
+                z.object({
+                    text: z.string(),
+                    imageUrl: z.string().nullable(),
+                }),
+            ),
         });
 
         const completion = await this.client.beta.chat.completions.parse({
@@ -131,6 +135,6 @@ export class FeedPostGenerator extends PostGenerator {
         const parsed = completion.choices[0].message.parsed ?? {
             posts: [],
         };
-        return parsed.posts.slice(0,3);
+        return parsed.posts.slice(0, 3);
     }
 }
