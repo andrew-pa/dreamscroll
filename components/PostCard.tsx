@@ -8,6 +8,7 @@ import {
     IconButton,
     Badge,
     Link as ChakraLink,
+    AspectRatio,
 } from "@chakra-ui/react";
 import { AiOutlineDislike, AiOutlineLike, AiFillHeart } from "react-icons/ai";
 import { useInView } from "react-intersection-observer";
@@ -69,14 +70,16 @@ export default function PostCard({ post }: Props) {
             </HStack>
 
             {post.imageUrl && (
-                <Image
-                    src={post.imageUrl}
-                    alt="generated visual"
-                    w="full"
-                    rounded="md"
-                    mb={2}
-                    loading="lazy"
-                />
+                <AspectRatio w="full" ratio={1} mb={2}>
+                    <Image
+                        src={post.imageUrl}
+                        alt=""
+                        w="full"
+                        rounded="md"
+                        loading="lazy"
+                        objectFit="cover"
+                    />
+                </AspectRatio>
             )}
 
             {post.body && (

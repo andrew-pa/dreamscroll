@@ -54,7 +54,7 @@ async function main() {
                     lastRun?.startTs ?? null,
                 );
                 console.log(`\tgenerated ${posts.length} posts`);
-                if(posts.length > 0) {
+                if (posts.length > 0) {
                     await postsRepo.createMany(posts);
                 }
                 postsMade += posts.length;

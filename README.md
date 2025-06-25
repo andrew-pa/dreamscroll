@@ -1,5 +1,3 @@
-
-
 ```
 (Enter MATHEMATICIAN, alone, contemplative, amidst a library strewn with obscure texts,
   glowing screens, and flickering candles.)
@@ -157,4 +155,4 @@ Aye, Marcus, thus reclaim thy true soul’s fate;
 
 ![demons are among us](https://github.com/user-attachments/assets/ec89b98f-e5a9-49a5-8f30-b223834c3095)
 
-*Who benefits if you believe this?*
+_Who benefits if you believe this?_

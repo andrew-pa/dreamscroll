@@ -166,7 +166,11 @@ export default function GeneratorCard({ g }: { g: GeneratorWithRun }) {
                             <strong>Type:</strong> {g.type}
                         </Text>
 
-                        <Stack direction={{ base: "column", md: "row" }} gapX={4} align="flex-start">
+                        <Stack
+                            direction={{ base: "column", md: "row" }}
+                            gapX={4}
+                            align="flex-start"
+                        >
                             <RunInfo run={g.lastRun} />
                         </Stack>
                     </Box>

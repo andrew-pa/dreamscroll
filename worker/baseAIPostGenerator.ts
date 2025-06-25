@@ -32,7 +32,7 @@ export abstract class BaseAIPostGenerator<
 
         const config = rawConfig as TConfig;
 
-        if(config.numPosts == 0) {
+        if (config.numPosts == 0) {
             return [];
         }
 

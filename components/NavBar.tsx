@@ -8,11 +8,7 @@ import {
     VStack,
     useDisclosure,
 } from "@chakra-ui/react";
-import {
-    FiBookmark,
-    FiSettings,
-    FiMenu,
-} from "react-icons/fi";
+import { FiBookmark, FiSettings, FiMenu } from "react-icons/fi";
 import NextLink from "next/link";
 import useSWR from "swr";
 import WorkerStatusIndicator from "./WorkerStatusIndicator";
@@ -97,7 +93,10 @@ export function NavBar() {
                 </IconButton>
             </Flex>
 
-            <Drawer.Root open={open} onOpenChange={e => (e.open ? onOpen() : onClose())}>
+            <Drawer.Root
+                open={open}
+                onOpenChange={e => (e.open ? onOpen() : onClose())}
+            >
                 <Drawer.Backdrop />
                 <Drawer.Positioner>
                     <Drawer.Content maxW="xs">
